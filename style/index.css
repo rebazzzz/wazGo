@@ -1,0 +1,9 @@
+nav{
+    height: 125px;
+}
+
+#logo{
+    height: 7rem;
+    width: auto;
+    border-radius: 50%;
+}
