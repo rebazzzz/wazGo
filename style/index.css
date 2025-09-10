@@ -45,5 +45,14 @@ nav{
 
     font-size: 1rem;
     cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    /* transition: background-color 0.3s ease; */
+}
 
+
+#nav__button:hover {
+    background-color: #e6b800;
+    color: black;
+    /* transition: background-color 0.3s ease; */
 }
