@@ -66,7 +66,7 @@ nav{
     align-items: center;
     color: blue;
     text-align: center;
-    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+    box-shadow: 0 125rem 0.25rem rgba(193, 68, 68, 0.1); 
 }
 
 .hero h1 {
@@ -80,10 +80,10 @@ nav{
     padding: 0 1rem;
     line-height: 1.2;
     margin: 0 auto 1rem auto;
+    /* box-shadow: 0 2px 4px rgba(186, 66, 66, 0.1); */
     /* animation: fadeIn 2s ease-in-out;
     transition: transform 0.3s ease;
     transform: scale(1); */
-
 }
 
 .hero h1:hover {
@@ -98,6 +98,8 @@ nav{
     color: #555;
     line-height: 1.5;
     padding: 0 1rem;
+    box-shadow: 0 125rem 0.25rem rgba(193, 68, 68, 0.1); 
+
     /* animation: fadeIn 2s ease-in-out 0.5s;
     animation-fill-mode: forwards; */
 }
@@ -110,6 +112,7 @@ nav{
 .hero p .highlight:hover {
     color: #1479df;
 }
+
 .hero button {
     padding: 0.75rem 1.5rem;
     font-size: 1.2rem;
@@ -121,4 +124,92 @@ nav{
     font-weight: bold;
     /* animation: fadeIn 2s ease-in-out 1s;
     animation-fill-mode: forwards; */
+}
+
+/* Tjänstesektion */
+.services {
+  text-align: center;
+  padding: 2rem 1rem; /* Använder rem för skalbar padding */
+  background-color: #f9f9f9;}
+
+.services h1 {
+ font-size: clamp(2.5rem, 6vw + 1rem, 5rem); /* Responsiv fontstorlek */
+margin: 0.5rem 0;
+}
+
+.services p {
+  font-size: 1.5rem;
+  color: #555;
+  margin: 0 auto 2rem auto;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem; /* 20px */
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.service {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.service img {
+  width: 100%;
+  height: auto;
+  max-width: 60px; /* Begränsar storleken på ikoner */
+  margin-bottom: 1rem;
+}
+
+.service h3 {
+  font-size: clamp(1.5rem, 2vw + 1rem, 1.8rem); /* Responsiv fontstorlek */
+  margin: 0.5rem 0;
+}
+
+.service p {
+  font-size: 1.15rem;
+  color: #555;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.cta-book {
+  background-color: #007bff;
+  color: white;
+}
+
+.cta-book:hover {
+  background-color: #0056b3;
+}
+
+.cta-cases {
+  background-color: #28a745;
+  color: white;
+}
+
+.cta-cases:hover {
+  background-color: #218838;
+}
+
+.service__cta {
+    display: flex;
+    margin: 1rem auto 0 auto;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    gap: 1.25rem;
 }
