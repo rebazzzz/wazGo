@@ -1,9 +1,15 @@
+body {
+    margin: 0;
+    background-color: #F8F9FA;
+    color: #333;
+}
+
 nav{
     height: 7.813rem;
     width: auto;
     display: flex;
     align-items: center;
-    background-color: #1479df;
+    background-color: #343A40;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -73,7 +79,7 @@ nav{
     font-size: 3.5rem;
     font-weight: bold;
     /* font-family: 'Arial Black', sans-serif; */
-    color: #1479df;
+    color: #343A40;
     text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
     text-transform: uppercase;
     letter-spacing: 0.25rem;
@@ -95,7 +101,7 @@ nav{
 .hero p {
     font-size: 1.75rem;
     margin: 0 auto 2rem auto;
-    color: #555;
+    color: #6C757D;
     line-height: 1.5;
     padding: 0 1rem;
     box-shadow: 0 125rem 0.25rem rgba(193, 68, 68, 0.1); 
@@ -110,20 +116,26 @@ nav{
 }
 
 .hero p .highlight:hover {
-    color: #1479df;
+    color: #ffcc00;
 }
 
 .hero button {
     padding: 0.75rem 1.5rem;
     font-size: 1.2rem;
     color: white;
-    background-color: #1479df;
+    background-color: #343A40;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
     /* animation: fadeIn 2s ease-in-out 1s;
     animation-fill-mode: forwards; */
+}
+
+.hero button:hover {
+    background-color: #ffcc00;
+    color: black;
+    transition: background-color 0.3s ease;
 }
 
 /* Tjänstesektion */
