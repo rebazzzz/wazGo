@@ -32,7 +32,7 @@ nav {
   display: flex;
   align-items: center;
   background-color: var(--green-dark);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--green-light);
   position: sticky;
   top: 0;
 z-index: 1000;
@@ -156,34 +156,38 @@ font-size: 1.2rem; /* något större text */
     color: var(--green-dark);
     font-size: 3rem;
 }
-
-.services p{
-    font-size: 1.2rem;
-    color: var(--text-secondary);
+.services-list {
+    list-style: disc inside;
+    margin: 0;
+    padding: 0;
     font-family: var(--font-body);
-    line-height: 1.5;
-    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: var(--text-dark);
 }
 
-.services a{
-    color: var(--text-secondary);
+.services-list li {
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+}
+
+.services-list a {
+    color: var(--green-dark);
     text-decoration: none;
     font-weight: 600;
-    font-family: var(--font-heading);
+    transition: color 0.3s, font-size 0.2s;
+}
+
+.services-list a:hover {
+    color: var(--green-light);
+    font-size: 1.1rem;
+}
+
+.services-list li::marker {
+    color: var(--green-dark);
     font-size: 1.2rem;
-    transition: color 0.3s ease, font-size 0.2s ease;
-    text-decoration: dashed underline;
-}
-.services a:hover{
-    color: var(--green-dark);
-    font-size: 1.3rem;
 }
 
-
-ul li::marker {
-    color: var(--green-dark);
-    font-size: 3rem;
-}
 
 
 
