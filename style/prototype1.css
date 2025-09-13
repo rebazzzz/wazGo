@@ -1,0 +1,241 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
+
+/* CSS-variabler för färger och typsnitt */
+:root {
+  /* Färger */
+  --green-dark:  #2E6F40;
+  --green-mid:   #43A047;
+  --green-light: #66BB6A;
+  --white:       #FFFFFF;
+  --text-dark:   #333333;
+  --text-secondary: #666666;
+
+  /* Typsnitt */
+  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
+}
+
+/* Global body-stil */
+body {
+  margin: 0;
+  background-color: var(--white);
+  color: var(--text-dark);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+/* Navigation / Header */
+nav {
+  height: 7.813rem;
+  display: flex;
+  align-items: center;
+  background-color: var(--green-dark);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#logo {
+  height: 7rem;
+  width: auto;
+  border-radius: 50%;
+  margin-left: 2rem;
+}
+
+.nav__links {
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+  margin-right: 1rem;
+  align-items: center;
+}
+
+.nav__links a {
+  color: var(--white);
+  font-size: 1.1rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease, font-size 0.2s ease, box-shadow 0.3s ease, border 0.2s ease;
+}
+
+.nav__links a:hover {
+  /* color: #66BB6A; ljus grön hoverfärg */
+/* border: 2px solid #66BB6A; */
+  /* box-shadow: 0px 2px 4px rgba(46, 111, 64, 0.5); */
+
+font-size: 1.2rem; /* något större text */
+  box-shadow: inset 0 -3px 0 0 var(--white); /* underline effekt */
+}
+
+
+#nav__button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--green-mid);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+#nav__button:hover {
+  background-color: var(--green-light);
+  color: var(--white);
+  font-size: 1.2rem;
+}
+
+/* Hero-sektionen */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  /* text color sätts via underliggande rubrik och paragrafer, så taket */
+}
+
+.hero h1 {
+  font-size: 3.435rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--green-dark);
+  background-color: var(--white);
+  text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.25rem;
+  padding: 0 1rem;
+  line-height: 1.2;
+  margin: 0 auto 1rem auto;
+}
+
+.hero p {
+  font-size: 1.75rem;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  margin: 0 auto 2rem auto;
+  line-height: 1.5;
+  padding: 0 1rem;
+}
+
+.hero button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.2rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--white);
+  background-color: var(--green-mid);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.hero button:hover {
+  background-color: var(--green-light);
+  color: var(--white);
+  transition: background-color 0.3s ease;
+  font-size: 1.4rem;
+}
+
+/* Tjänstesektion */
+.services {
+  text-align: center;
+  padding: 2rem 1rem;
+  background-color: #f9f9f9; /* neutral ljus bakgrund för att separera sektioner */
+}
+
+.services h1 {
+  font-size: clamp(2.5rem, 6vw + 1rem, 5rem);
+  margin: 0.5rem 0;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
+.services p {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  margin: 0 auto 2rem auto;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.service {
+  background: var(--white);
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.service img {
+  width: 100%;
+  height: auto;
+  max-width: 60px;
+  margin-bottom: 1rem;
+}
+
+.service h3 {
+  font-size: clamp(1.5rem, 2vw + 1rem, 1.8rem);
+  margin: 0.5rem 0;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--green-dark);
+}
+
+.service p {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+}
+
+/* CTA knappar i sektioner */
+.cta-button {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  color: var(--white);
+}
+
+.cta-book {
+  background-color: #007bff;  /* OBS: denna avvikelse — blå CTA, om du vill att allt ska vara grönt, kan ändra till green mid */
+}
+
+.cta-book:hover {
+  background-color: #0056b3;
+}
+
+.cta-cases {
+  background-color: #28a745;  /* också blå/green-hybrid – kan ändras till varianter av din gröna mid eller light om önskan */
+}
+
+.cta-cases:hover {
+  background-color: #218838;
+}
+
+/* Service CTA wrapper */
+.service__cta {
+  display: flex;
+  margin: 1rem auto 0 auto;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+}
