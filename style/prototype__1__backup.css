@@ -91,7 +91,7 @@ font-size: 1.2rem; /* något större text */
 
 /* Hero-sektionen */
 .hero {
-  height: 100vh;
+  height: calc(100vh - 10.5rem); /* Full höjd minus nav höjd */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -142,34 +142,120 @@ font-size: 1.2rem; /* något större text */
   font-size: 1.4rem;
 }
 
+.digital-capabilities {
+  background-color: #f4f4f4;
+  padding: 2rem;
+  text-align: center;
+}
+
+.digital-capabilities h2 {
+  font-size: 2.5rem;
+  color: #2E6F40;
+  margin-bottom: 1rem;
+}
+
+.digital-capabilities p {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.capabilities-list {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.capability-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 22%;
+  margin: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.capability-item h3 {
+  font-size: 1.5rem;
+  color: #2E6F40;
+  margin-bottom: 1rem;
+}
+
+.capability-item p {
+  font-size: 1rem;
+  color: #555;
+}
+
+.capability-item a {
+  text-decoration: none;
+  color: #FFFFFF;
+  background-color: #43A047;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.capability-item a:hover {
+  background-color: #66BB6A;
+  transform: translateY(-2px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Tjänstesektion */
 .services {
-  text-align: center;
   padding: 2rem 1rem;
-  background-color: #f9f9f9; /* neutral ljus bakgrund för att separera sektioner */
+  
+  /* background-color: #f9f9f9; neutral ljus bakgrund för att separera sektioner */
 }
 
 .services h1 {
-  font-size: clamp(2.5rem, 6vw + 1rem, 5rem);
-  margin: 0.5rem 0;
+  font-size: clamp(2rem, 5vw + 1rem, 4rem);
+  margin: 0 0 1rem 3.75rem;
   font-family: var(--font-heading);
   font-weight: 700;
   color: var(--green-dark);
 }
 
 .services p {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: var(--text-secondary);
   font-family: var(--font-body);
-  margin: 0 auto 2rem auto;
+  margin: 0 auto 1rem 3.75rem;
 }
 
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  /* gap: 1.25rem; */
   max-width: 100%;
-  margin: 0 auto;
+  margin: auto auto auto 3.75rem;
 }
 
 .service {
