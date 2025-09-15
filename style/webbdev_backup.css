@@ -1,0 +1,93 @@
+/* Hero för undersidor */
+.sub-hero {
+  padding: 6rem 2rem 4rem 2rem;
+  text-align: center;
+  background: var(--white);
+  border-bottom: 1px solid #eee;
+}
+
+.sub-hero h1 {
+  font-size: 3rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 1rem;
+}
+
+.sub-hero p {
+  font-size: 1.3rem;
+  color: var(--text-dark);
+  max-width: 65ch;
+  margin: 0 auto 2rem auto;
+  line-height: 1.6;
+}
+
+.sub-hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Sektioner */
+section {
+  padding: 4rem 2rem;
+  max-width: 70rem;
+  margin: 0 auto;
+}
+
+section h2 {
+  font-size: 2rem;
+  font-family: var(--font-heading);
+  color: var(--green-dark);
+  margin-bottom: 1rem;
+}
+
+section p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+section ul, section ol {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  margin-left: 1.5rem;
+}
+
+section li {
+  margin-bottom: 0.5rem;
+}
+
+/* CTA */
+.cta {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--green-dark);
+  color: var(--white);
+}
+
+.cta-button {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  margin: 0.5rem;
+  cursor: pointer;
+}
+
+.cta-cases {
+  background: var(--green-light);
+  color: var(--white);
+}
+
+.cta-book {
+  background: var(--white);
+  color: var(--green-dark);
+}
+
+.cta-button:hover {
+  transform: scale(1.05);
+  transition: all 0.2s ease-in-out;
+}
