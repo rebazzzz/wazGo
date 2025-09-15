@@ -234,11 +234,21 @@ font-size: 1.2rem; /* något större text */
   font-size: 1.4rem;
 }
 
+
+/* .industries */
 .industries {
   background-color: var(--white);
   padding: 0 2rem;
-  text-align: start; /* Justerar texten till vänster */
+  text-align: start;
+}
 
+.industries h1,
+.industries p {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 .industries h1 {
@@ -246,9 +256,7 @@ font-size: 1.2rem; /* något större text */
   font-family: var(--font-heading);
   color: var(--green-dark);
   font-size: 3.1rem;
-  margin-left: 35rem; /* Justera detta värde för att öka eller minska avståndet */
-  
-
+  margin-left: 35rem;
 }
 
 .industries p {
@@ -258,7 +266,7 @@ font-size: 1.2rem; /* något större text */
   line-height: 1.25;
   margin-top: 0;
   margin-bottom: 1rem;
-  margin-left: 35rem; /* Samma höger-marginal som rubriken */
+  margin-left: 35rem;
 }
 
 .industries span.highlight {
@@ -268,32 +276,26 @@ font-size: 1.2rem; /* något större text */
   font-weight: 600;
 }
 
+/* .industries-list */
 .industries-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   font-family: var(--font-body);
   font-size: 1.15rem;
   color: var(--text-dark);
-  margin-left: 35rem; /* Samma vänstermarginal som rubriken och brödtexten */
-  padding-left: 0; /* Säkerställer att ingen extra indragning finns */
+  margin-left: 35rem;
+  width: calc(100% - 35rem);
 }
 
-
 .industries-list li {
-  margin: 0;
-  padding: 0;
   line-height: 1.25;
   display: flex;
   align-items: center;
 }
 
-
 .industries-list li::before {
   content: "•";
   color: var(--green-dark);
   font-size: 1.5rem;
-  margin-right: 0.5rem; /* Utrymme mellan punkt och text */
+  margin-right: 0.5rem;
 }
 
 .industries-list a {
@@ -310,14 +312,11 @@ font-size: 1.2rem; /* något större text */
   box-shadow: inset 0 -3px 0 0 var(--green-light);
 }
 
-
 .industries div {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
 }
-
-
 
 .industries button {
   padding: 0.75rem 1.5rem;
@@ -337,6 +336,34 @@ font-size: 1.2rem; /* något större text */
   transition: background-color 0.3s ease;
   font-size: 1.4rem;
 }
+
+/* Responsiva justeringar */
+/* @media (max-width: 1200px) {
+  .industries h1,
+  .industries p,
+  .industries-list {
+    margin-left: 10rem;
+    width: calc(100% - 10rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .industries h1,
+  .industries p,
+  .industries-list {
+    margin-left: 2rem;
+    width: calc(100% - 2rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .industries h1,
+  .industries p,
+  .industries-list {
+    margin-left: 1rem;
+    width: calc(100% - 1rem);
+  }
+} */
 
 
 
