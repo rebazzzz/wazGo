@@ -147,28 +147,35 @@ font-size: 1.2rem; /* något större text */
 
 .services {
   background-color: var(--white);
-  padding: 0 2rem;
-  display: flex;
-  align-items: flex-start; /* så listan och bilden börjar upptill */
-  gap: 2rem; /* mellan lista och bild */
-  flex-wrap: wrap; /* så att bild hamnar under lista på mindre skärmar */
+  padding: 4rem 2rem;
+  align-items: center;
 }
+
+.services-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
 
 .services h1{
     font-weight: 700;
     font-family: var(--font-heading);
     color: var(--green-dark);
     font-size: 3.1rem;
+    margin-bottom: 0.5rem;
 }
 
 .services p{
-    /* color: var(--text-secondary); */
-    color: black;
+    max-width: 65ch;
+    color: var(--text-dark);
     font-family: var(--font-body);
     font-size: 1.2rem;
-    line-height: 1.25;
+    line-height: 1.5;
     margin-bottom: 1rem;
-    color: var(--text-dark);
 }
 
 .services span.highlight {
@@ -179,9 +186,11 @@ font-size: 1.2rem; /* något större text */
 }
 
 .services-list {
+  flex: 1 1 300px;
   display: inline-block;
   vertical-align: top;
-  width: 45%;
+  list-style: disc;
+  width: 50%;
   margin: 0; 
   padding: 0;
   font-family: var(--font-body);
@@ -190,9 +199,9 @@ font-size: 1.2rem; /* något större text */
 }
 
 .services-list li {
-    margin: 0;
+    margin: 0.5rem 0;
     padding: 0;
-    line-height: 1.25;
+    line-height: 1.55;
     text-decoration: dotted underline;
 }
 
@@ -222,9 +231,10 @@ font-size: 1.2rem; /* något större text */
 }
 
 .services-image {
-  display: inline-block;
-  vertical-align: top;
-  width: 45%;
+  flex: 1 1 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .services-image img {
