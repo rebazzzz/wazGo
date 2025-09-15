@@ -243,18 +243,37 @@ font-size: 1.2rem; /* något större text */
   display: block;
 }
 
+/* industries */
 
 .industries {
   background-color: var(--white);
-  padding: 0 2rem;
+  padding: 4rem 2rem;
+  display: flex;
+  justify-content: center;
 }
 
-.industries-intro {
-  margin-left: 35rem;
-  width: calc(100% - 35rem);
-  line-height: 1.55rem; /* ändrat från “rrem” */
-  margin-bottom: 1rem;
-  display: block; /* inline-block kan ibland orsaka oväntade boxar */
+.industries-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 3rem;
+  max-width: 80rem;
+  width: 100%;
+}
+
+.industries-image {
+  flex: 1 1 40%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.industries-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.industries-text {
+  flex: 1 1 60%;
 }
 
 .industries h1{
@@ -262,15 +281,15 @@ font-size: 1.2rem; /* något större text */
     font-family: var(--font-heading);
     color: var(--green-dark);
     font-size: 3.1rem;
+    margin-bottom: 1rem;
 }
 
 .industries p{
-    /* color: var(--text-secondary); */
     color: var(--text-dark);
     font-family: var(--font-body);
     font-size: 1.15rem;
-    line-height: 1.25;
-    margin-top: 0;
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
 }
 
 .industries span.highlight {
@@ -280,19 +299,22 @@ font-size: 1.2rem; /* något större text */
   font-weight: 600;
 }
 
+.industries-list ul {
+  padding: 0;
+  margin: 0 0 1.5rem 1.5rem; /* justerar vänstermarginalen för att passa in under texten */
+}
 
-.industries-list {
+/* .industries-list {
   margin-left: 35rem;
   width: calc(100% - 35rem);
   line-height: 1.25rem;
   margin-bottom: 1rem;
   display: block;
-}
+} */
 
 .industries-list li{
   font-size: 1.15rem;
   margin: 0.5rem 0;
-  padding: 0;
   line-height: 1.55;
 }
 
@@ -316,11 +338,7 @@ font-size: 1.2rem; /* något större text */
 }
 
 .industries-buttons {
-  margin-left: 35rem;
-  width: calc(100% - 35rem);
-  line-height: 1.25rem;
-  margin-bottom: 1rem;
-  display: block;
+  margin-top: 1rem;
 }
 
 .industries__button {

@@ -1,26 +1,38 @@
-.services {
+.industries {
   background-color: var(--white);
   padding: 4rem 2rem;
   display: flex;
   justify-content: center;
 }
 
-.services-content {
+.industries-content {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 3rem;
-  flex-wrap: wrap;
   max-width: 80rem;
   width: 100%;
 }
 
-/* Vänstersida */
-.services-left {
+/* Bild vänster */
+.industries-image {
   flex: 1 1 40%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-.services-left h1 {
+.industries-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Text höger */
+.industries-text {
+  flex: 1 1 60%;
+}
+
+.industries h1 {
   font-weight: 700;
   font-family: var(--font-heading);
   color: var(--green-dark);
@@ -28,65 +40,71 @@
   margin-bottom: 1rem;
 }
 
-.services-left p {
-  max-width: 55ch;
+.industries p {
   color: var(--text-dark);
   font-family: var(--font-body);
-  font-size: 1.2rem;
-  line-height: 1.5;
+  font-size: 1.15rem;
+  line-height: 1.55;
   margin-bottom: 1.5rem;
 }
 
-.services-left span.highlight {
+.industries span.highlight {
   box-shadow: inset 0 -0.15rem 0 0 var(--green-light);
   padding: 0.1rem 0.3rem;
   border-radius: 5px;
   font-weight: 600;
 }
 
-/* Lista */
-.services-list {
-  list-style: disc;
+/* Listan */
+.industries-list ul {
   padding: 0;
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: 1.15rem;
-  color: var(--text-dark);
+  margin: 0 0 1.5rem 1.5rem;
 }
 
-.services-list li {
+.industries-list li {
+  font-size: 1.15rem;
   margin: 0.5rem 0;
   line-height: 1.55;
 }
 
-.services-list li::marker {
+.industries-list li::marker {
   color: var(--green-dark);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
 
-.services-list a {
+.industries-list a {
   color: black;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s, font-size 0.2s;
 }
 
-.services-list a:hover {
+.industries-list a:hover {
   color: var(--green-light);
   font-size: 1.2rem;
   box-shadow: inset 0 -3px 0 0 var(--green-light);
 }
 
-/* Högersida */
-.services-image {
-  flex: 1 1 40%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Knappar */
+.industries-buttons {
+  margin-top: 1rem;
 }
 
-.services-image img {
-  max-width: 100%;
-  height: auto;
-  display: block;
+.industries__button {
+  font-family: var(--font-heading);
+  color: var(--white);
+  background-color: var(--green-mid);
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  padding: 0.55rem 1.3rem;
+  margin-right: 1rem;
+  font-size: 1.085rem;
+}
+
+.industries__button:hover {
+  background-color: var(--green-light);
+  color: var(--white);
+  transition: background-color 0.3s ease;
+  font-size: 1.185rem;
 }
