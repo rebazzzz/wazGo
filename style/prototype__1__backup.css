@@ -221,7 +221,7 @@ font-size: 1.2rem; /* något större text */
 
 .services-list li::marker {
     color: var(--green-dark);
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .services div {
@@ -244,9 +244,6 @@ font-size: 1.2rem; /* något större text */
 }
 
 
-
-
-
 .industries {
   background-color: var(--white);
   padding: 0 2rem;
@@ -255,7 +252,7 @@ font-size: 1.2rem; /* något större text */
 .industries-intro {
   margin-left: 35rem;
   width: calc(100% - 35rem);
-  line-height: 1.25rem; /* ändrat från “rrem” */
+  line-height: 1.55rem; /* ändrat från “rrem” */
   margin-bottom: 1rem;
   display: block; /* inline-block kan ibland orsaka oväntade boxar */
 }
@@ -293,13 +290,15 @@ font-size: 1.2rem; /* något större text */
 }
 
 .industries-list li{
-  line-height: 1.25rem;
   font-size: 1.15rem;
+  margin: 0.5rem 0;
+  padding: 0;
+  line-height: 1.55;
 }
 
 .industries-list li::marker {
     color: var(--green-dark);
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .industries-list a {
