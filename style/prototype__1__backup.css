@@ -148,6 +148,10 @@ font-size: 1.2rem; /* något större text */
 .services {
   background-color: var(--white);
   padding: 0 2rem;
+  display: flex;
+  align-items: flex-start; /* så listan och bilden börjar upptill */
+  gap: 2rem; /* mellan lista och bild */
+  flex-wrap: wrap; /* så att bild hamnar under lista på mindre skärmar */
 }
 
 .services h1{
@@ -175,12 +179,14 @@ font-size: 1.2rem; /* något större text */
 }
 
 .services-list {
-    list-style: disc inside;
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-body);
-    font-size: 1.15rem;
-    color: var(--text-dark);
+  display: inline-block;
+  vertical-align: top;
+  width: 45%;
+  margin: 0; 
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  color: var(--text-dark);
 }
 
 .services-list li {
@@ -215,58 +221,49 @@ font-size: 1.2rem; /* något större text */
   gap: 1rem; /* lite mellanrum mellan knapparna */
 }
 
-.services button {
-  padding: 0.75rem 1.5rem;
-  font-size: 1.2rem;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  color: var(--white);
-  background-color: var(--green-mid);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.services-image {
+  display: inline-block;
+  vertical-align: top;
+  width: 45%;
 }
 
-.services button:hover {
-  background-color: var(--green-light);
-  color: var(--white);
-  transition: background-color 0.3s ease;
-  font-size: 1.4rem;
+.services-image img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 
-/* .industries */
+
+
+
 .industries {
   background-color: var(--white);
   padding: 0 2rem;
-  text-align: start;
 }
 
-.industries h1,
-.industries p {
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  line-height: 1.25;
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-
-.industries h1 {
-  font-weight: 700;
-  font-family: var(--font-heading);
-  color: var(--green-dark);
-  font-size: 3.1rem;
+.industries-intro {
   margin-left: 35rem;
+  width: calc(100% - 35rem);
+  line-height: 1.25rem; /* ändrat från “rrem” */
+  margin-bottom: 1rem;
+  display: block; /* inline-block kan ibland orsaka oväntade boxar */
 }
 
-.industries p {
-  color: var(--text-dark);
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  line-height: 1.25;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  margin-left: 35rem;
+.industries h1{
+    font-weight: 700;
+    font-family: var(--font-heading);
+    color: var(--green-dark);
+    font-size: 3.1rem;
+}
+
+.industries p{
+    /* color: var(--text-secondary); */
+    color: var(--text-dark);
+    font-family: var(--font-body);
+    font-size: 1.15rem;
+    line-height: 1.25;
+    margin-top: 0;
 }
 
 .industries span.highlight {
@@ -276,141 +273,63 @@ font-size: 1.2rem; /* något större text */
   font-weight: 600;
 }
 
-/* .industries-list */
+
 .industries-list {
-  font-family: var(--font-body);
-  font-size: 1.15rem;
-  color: var(--text-dark);
   margin-left: 35rem;
   width: calc(100% - 35rem);
+  line-height: 1.25rem;
+  margin-bottom: 1rem;
+  display: block;
 }
 
-.industries-list li {
-  line-height: 1.25;
-  display: flex;
-  align-items: center;
+.industries-list li{
+  line-height: 1.25rem;
+  font-size: 1.15rem;
 }
 
-.industries-list li::before {
-  content: "•";
-  color: var(--green-dark);
-  font-size: 1.5rem;
-  margin-right: 0.5rem;
+.industries-list li::marker {
+    color: var(--green-dark);
+    font-size: 1.5rem;
 }
 
 .industries-list a {
-  color: black;
-  font-weight: 600;
-  text-decoration: underline dotted;
-  transition: color 0.3s, font-size 0.2s;
-  display: inline-block;
+    color: black;
+    text-decoration: dotted underline;
+    font-weight: 600;
+    transition: color 0.3s, font-size 0.2s;
 }
 
 .industries-list a:hover {
-  color: var(--green-light);
-  font-size: 1.2rem;
-  box-shadow: inset 0 -3px 0 0 var(--green-light);
+    color: var(--green-light);
+    font-size: 1.2rem;
+    box-shadow: inset 0 -3px 0 0 var(--green-light); /* underline effekt */
+
 }
 
-.industries div {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+.industries-buttons {
+  margin-left: 35rem;
+  width: calc(100% - 35rem);
+  line-height: 1.25rem;
+  margin-bottom: 1rem;
+  display: block;
 }
 
-.industries button {
-  padding: 0.75rem 1.5rem;
-  font-size: 1.2rem;
+.industries__button {
   font-family: var(--font-heading);
-  font-weight: 700;
   color: var(--white);
   background-color: var(--green-mid);
+  cursor: pointer;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  padding: 0.55rem 1.3rem;
+  margin-right: 1rem; /* lite mellanrum mellan knapparna */
+  font-size: 1.085rem;
 }
 
-.industries button:hover {
+.industries__button:hover {
   background-color: var(--green-light);
   color: var(--white);
   transition: background-color 0.3s ease;
-  font-size: 1.4rem;
+  font-size: 1.185rem;
 }
 
-/* Responsiva justeringar */
-/* @media (max-width: 1200px) {
-  .industries h1,
-  .industries p,
-  .industries-list {
-    margin-left: 10rem;
-    width: calc(100% - 10rem);
-  }
-}
-
-@media (max-width: 768px) {
-  .industries h1,
-  .industries p,
-  .industries-list {
-    margin-left: 2rem;
-    width: calc(100% - 2rem);
-  }
-}
-
-@media (max-width: 480px) {
-  .industries h1,
-  .industries p,
-  .industries-list {
-    margin-left: 1rem;
-    width: calc(100% - 1rem);
-  }
-} */
-
-
-
-
-
-
-
-
-
-
-
-
-/* CTA knappar i sektioner */
-.cta-button {
-  display: inline-block;
-  padding: 12px 24px;
-  font-size: 1.2rem;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-  color: var(--white);
-}
-
-.cta-book {
-  background-color: #007bff;  /* OBS: denna avvikelse — blå CTA, om du vill att allt ska vara grönt, kan ändra till green mid */
-}
-
-.cta-book:hover {
-  background-color: #0056b3;
-}
-
-.cta-cases {
-  background-color: #28a745;  /* också blå/green-hybrid – kan ändras till varianter av din gröna mid eller light om önskan */
-}
-
-.cta-cases:hover {
-  background-color: #218838;
-}
-
-/* Service CTA wrapper */
-.service__cta {
-  display: flex;
-  margin: 1rem auto 0 auto;
-  justify-content: center;
-  align-items: center;
-  gap: 1.25rem;
-}
