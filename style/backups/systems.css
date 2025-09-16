@@ -101,13 +101,13 @@
 
 .overview-content .webbdev-image img {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  max-height: 285px;
+  aspect-ratio: 4 / 3;   /* proportioner */
+  object-fit: cover;     
+  max-height: 285px;     /* gör bilden kortare vertikalt */
   border-radius: 8px;
 }
 
-/* BENEFITS */
+/* BENEFITS GRID */
 .benefits {
   padding: 4rem 2rem;
   background: var(--white);
@@ -116,11 +116,11 @@
 
 .benefits-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  row-gap: 1rem;
-  column-gap: 2.5rem;
+  grid-template-columns: repeat(2, 1fr); /* två kolumner */
+  gap: 2rem;
   max-width: 90rem;
   margin: 0 auto;
+  row-gap: 1rem; /* vertikalt mellan rader */
 }
 
 .benefit-card {
@@ -149,10 +149,14 @@
   line-height: 1.65;
 }
 
-/* Responsiv */
+/* Responsiv grid */
 @media (max-width: 768px) {
   .benefits-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* alla under varandra på mobil */
+  }
+
+  .overview-content {
+    flex-direction: column;
   }
 }
 
@@ -160,7 +164,7 @@
 .cta {
   text-align: center;
   color: var(--white);
-  margin-top: 0;
+  margin-top: 2rem;
 }
 
 .cta-button {

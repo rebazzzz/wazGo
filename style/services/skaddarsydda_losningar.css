@@ -1,4 +1,4 @@
-/* Hero för undersidor */
+/* HERO för undersidor */
 .sub-hero {
   padding: 6rem 2rem 0 2rem;
   background: var(--white);
@@ -20,7 +20,8 @@
   line-height: 1.6;
 }
 
-/* Sektioner */
+
+/* OVERVIEW */
 .overview {
   padding: 4rem 2rem;
   max-width: 70rem;
@@ -79,7 +80,7 @@
   content: "✔";
   position: absolute;
   left: 0;
-  color: green;
+  color: var(--green-dark);
   font-weight: bold;
 }
 
@@ -92,7 +93,11 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.overview-content button:hover {
+  transform: scale(1.05);
 }
 
 .overview-content .webbdev-image {
@@ -107,6 +112,7 @@
   border-radius: 8px;
 }
 
+
 /* BENEFITS */
 .benefits {
   padding: 4rem 2rem;
@@ -117,10 +123,11 @@
 .benefits-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  row-gap: 1rem;
-  column-gap: 2.5rem;
+  gap: 2.5rem;
   max-width: 90rem;
   margin: 0 auto;
+  row-gap: 1rem;
+  column-gap: 2.5rem;
 }
 
 .benefit-card {
@@ -134,6 +141,7 @@
 .benefit-card img {
   width: 60px;
   height: 60px;
+  margin-bottom: 0.75rem;
 }
 
 .benefit-card h3 {
@@ -149,12 +157,17 @@
   line-height: 1.65;
 }
 
-/* Responsiv */
+/* RESPONSIVT */
 @media (max-width: 768px) {
   .benefits-grid {
     grid-template-columns: 1fr;
   }
+  
+  .overview-content {
+    flex-direction: column;
+  }
 }
+
 
 /* CTA */
 .cta {
@@ -177,11 +190,6 @@
 .cta-cases {
   background: var(--green-light);
   color: var(--white);
-}
-
-.cta-book {
-  background: var(--white);
-  color: var(--green-dark);
 }
 
 .cta-button:hover {
