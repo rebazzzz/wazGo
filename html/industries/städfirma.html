@@ -1,78 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waz Go/ Städfirma</title>
-    <link rel="stylesheet" href="/style/index.css">
-    <link rel="stylesheet" href="/style/ai_automation.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waz Go / Städfirma</title>
+  <link rel="stylesheet" href="/style/index.css">
+  <link rel="stylesheet" href="/style/industries/stadfirma.css">
 </head>
 <body>
 
-    <nav>
-        <a href="/html/index.html"><img id="logo" src="/images/placeholder.png" alt="Waz Go Logo"></a>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="/html/index.html"><img id="logo" src="/images/placeholder.png" alt="Waz Go Logo"></a>
+    <div class="nav__links">
+      <a href="/html/index.html#our_services">Tjänster</a>
+      <a href="/html/index.html#our_industries">Branscher</a>
+      <a href="#">Portfolio / Demo</a>
+      <a href="#">Om oss</a>
+      <button id="nav__button">Boka möte</button>
+    </div>
+  </nav>
 
-        <div class="nav__links">
-             <a href="#">Tjänster</a>
-             <a href="#">Branscher</a>
-             <a href="#">Portfolio / Demo</a>
-             <a href="#">Om oss</a>
-             <button id="nav__button">Boka möte</button>
-        </div>
-    </nav>
+  <!-- HERO -->
+  <header class="sub-hero">
+    <h1>Städfirma</h1>
+    <p>Effektiv bokning, staff planering och fakturering hjälper städfirmor att ta fler uppdrag utan att tappa kontroll och kvalitet.</p>
+  </header>
 
-
-<!-- cleaning.html -->
-<main class="service-page">
-  <h1>Städfirma</h1>
-  <p class="intro">Effektiv bokning, staff-planering och fakturering hjälper städfirmor att ta fler uppdrag utan att tappa kontroll.</p>
-
+  <!-- OVERVIEW -->
   <section class="overview">
-    <h2>Problem → Lösning → Resultat</h2>
-    <p>Dubbelbokningar, no-shows och tung administration tar tid. Vi bygger bokningssystem, automatiska påminnelser och schemaläggning som minskar no-shows och underlättar planeringen.</p>
+    <h2>Från Utmaning till Smarta Lösningar</h2>
+    <p id="highlight_text">
+      <span class="highlight">Dubbelbokningar, no shows och tung administration tar tid och minskar effektiviteten.</span>
+    </p>
+    <p>
+      Waz Go bygger smarta bokningssystem, automatiska påminnelser och schemaläggning som minskar no shows och gör planeringen enkel och effektiv.
+    </p>
+
+    <!-- WRAPPER LIST + IMAGE -->
+    <div class="overview-content">
+      <ul>
+        <li><strong>Online-bokning och realtidskalender:</strong> Kunder kan boka direkt och personal får tydliga scheman med automatiska påminnelser.</li>
+        <li><strong>Personalplanering & ruttdragning:</strong> Optimera resurser och planera arbetsuppgifter effektivt.</li>
+        <li><strong>Fakturering & betalningsintegration:</strong> Snabbare fakturering och bättre kassaflöde med automatiserade lösningar.</li>
+        <li><strong>Dashboard & rapporter:</strong> Få översikt över intäkter, kundnöjdhet och arbetsflöden.</li>
+        <li><strong>Support & implementation:</strong> Fullt stöd under lansering och optimering av processer.</li>
+      </ul>
+
+      <div class="webbdev-image">
+        <img src="/images/placeholder.png" alt="Städfirma illustration">
+        <button>Kontakta oss!</button>
+        <button>Se Demo</button>
+      </div>
+    </div>
   </section>
 
-  <section class="included">
-    <h2>Vad ingår</h2>
-    <ul>
-      <li>Online-bokning och realtidskalender med automatiska påminnelser.</li>
-      <li>Personalplanering och ruttdragning för jobben.</li>
-      <li>Fakturering & betalningsintegration.</li>
-      <li>Dashboard & rapporter för intäkter och kundnöjdhet.</li>
-    </ul>
-  </section>
-
+  <!-- BENEFITS GRID -->
   <section class="benefits">
-    <h2>Fördelar / Resultat</h2>
-    <ul>
-      <li>Minskade no-shows och bättre tidsutnyttjande.</li>
-      <li>Snabbare fakturering och bättre kassaflöde.</li>
-      <li>Möjlighet att växa utan mer administration.</li>
-    </ul>
-    <p class="citation">Källor: Specialiserade boknings- och schemaläggningsverktyg minskar no-shows och sparar tid för städföretag. :contentReference[oaicite:5]{index=5}</p>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Minskade no-shows">
+        <h3>Minskade No Shows</h3>
+        <p>Automatiska påminnelser och smart schemaläggning minskar dubbelbokningar och uteblivna uppdrag.</p>
+      </div>
+
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Effektiv planering">
+        <h3>Effektiv Planering</h3>
+        <p>Realtidskalender och ruttdragning gör att personal och uppdrag koordineras smidigt.</p>
+      </div>
+
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Snabbare fakturering">
+        <h3>Snabbare Fakturering</h3>
+        <p>Automatiserade fakturor och betalningsintegration förbättrar kassaflödet.</p>
+      </div>
+
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Skalbara lösningar">
+        <h3>Skalbara Lösningar</h3>
+        <p>Lösningarna växer med företaget, vilket gör det möjligt att ta fler uppdrag utan extra administration.</p>
+      </div>
+    </div>
   </section>
 
-  <section class="case">
-    <h2>Exempel / Case</h2>
-    <p><em>Demo-Städ</em> – Implementering av online-bokning och automatiska påminnelser halverade no-shows (demo-data).</p>
+  <!-- CTA -->
+  <section class="cta">
+    <a href="#"><button class="cta-button cta-cases">Boka en gratis konsultation</button></a>
+    <a href="/html/index.html#our_industries"><button class="cta-button cta-book">Se lösningar för andra branscher</button></a>
   </section>
 
-  <section class="faq">
-    <h2>Vanliga frågor</h2>
-    <ul>
-      <li><strong>Kan kunder betala direkt vid bokning?</strong> – Ja, vi integrerar säkra betalningslösningar.</li>
-    </ul>
-  </section>
-
-  <div class="cta">
-    <a href="/kontakt" class="cta-button">Boka gratis konsultation</a>
-  </div>
-</main>
-
-<div class="cta">
-    <a href="#"> <button class="cta-button cta-cases">Boka en gratis konsultation</button></a>
-    <a href="#" class="cta-button cta-book">Se lösningar till din bransch</a>  
-</div>
+  <footer>
+    <p>&copy; 2024 Waz Go. Alla rättigheter förbehållna.</p>
+  </footer>
 
 </body>
 </html>

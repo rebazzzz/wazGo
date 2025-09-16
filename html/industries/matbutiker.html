@@ -1,81 +1,98 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waz Go/ Matutiker</title>
-    <link rel="stylesheet" href="/style/index.css">
-    <link rel="stylesheet" href="/style/ai_automation.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waz Go / Mat- & Dagligvaruhandel</title>
+  <link rel="stylesheet" href="/style/index.css">
+  <link rel="stylesheet" href="/style/industries/matbutiker.css">
 </head>
 <body>
 
-    <nav>
-        <a href="/html/index.html"><img id="logo" src="/images/placeholder.png" alt="Waz Go Logo"></a>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="/html/index.html"><img id="logo" src="/images/placeholder.png" alt="Waz Go Logo"></a>
+    <div class="nav__links">
+      <a href="/html/index.html#our_services">Tjänster</a>
+      <a href="/html/index.html#our_industries">Branscher</a>
+      <a href="#">Portfolio / Demo</a>
+      <a href="#">Om oss</a>
+      <button id="nav__button">Boka möte</button>
+    </div>
+  </nav>
 
-        <div class="nav__links">
-             <a href="#">Tjänster</a>
-             <a href="#">Branscher</a>
-             <a href="#">Portfolio / Demo</a>
-             <a href="#">Om oss</a>
-             <button id="nav__button">Boka möte</button>
-        </div>
-    </nav>
+  <!-- HERO -->
+  <header class="sub-hero">
+    <h1>Mat- & Dagligvaruhandel</h1>
+    <p>Matbutiker kan öka lönsamhet, minska svinn och ge kunder bättre upplevelser genom smarta digitala lösningar. Vi hjälper er att automatisera processer, förbättra lagerhantering och skapa personliga kundupplevelser.</p>
+  </header>
 
-    <!-- grocery.html -->
-<main class="service-page">
-  <h1>Mat- & dagligvaruhandel</h1>
-  <p class="intro">
-    Matbutiker kan minska svinn och förbättra lagersaldo med AI-driven prognostisering, personliga erbjudanden och automatiserade beställningsflöden.
-  </p>
-
+  <!-- OVERVIEW -->
   <section class="overview">
-    <h2>Problem → Lösning → Resultat</h2>
-    <p>
-      Manuellt lagerarbete leder ofta till överlager eller brist. Vi implementerar efterfrågeprognoser och automatiserade beställningar så att ni har rätt varor i rätt tid.
+    <h2>Från Utmaning till Effektiva Lösningar</h2>
+    <p id="highlight_text">
+      <span class="highlight">Manuellt lagerarbete och bristfällig prognostisering leder ofta till överlager, svinn och missade intäkter.</span>
     </p>
+    <p>
+      Waz Go implementerar AI drivna prognoser, automatiserade beställningsflöden och personaliserade kundlösningar. Resultatet blir färre misstag, bättre lagerkontroll, optimerad ekonomi och nöjdare kunder.
+    </p>
+
+    <!-- WRAPPER LIST + IMAGE -->
+    <div class="overview-content">
+      <ul>
+        <li><strong>AI baserad lager- och beställningsprognos:</strong> Optimera varuflöden och minska svinn genom smarta prognoser och automatiska inköpsförslag.</li>
+        <li><strong>Personliga kundportaler & lojalitetssystem:</strong> Erbjud individuella erbjudanden, kundanpassade kampanjer och smidiga betalningsflöden.</li>
+        <li><strong>Chatbot för e-handel & kundsupport:</strong> Hantera frågor, reklamationer och beställningar automatiskt via webben och sociala medier.</li>
+        <li><strong>Automatiserade marknadsföringskampanjer:</strong> Segmentera kunder, skicka personliga erbjudanden och öka återkommande köp.</li>
+        <li><strong>Testning, lansering & support:</strong> Fullt stöd under implementation och löpande optimering av system och processer.</li>
+      </ul>
+
+      <div class="webbdev-image">
+        <img src="/images/placeholder.png" alt="Dagligvaruautomation illustration">
+        <button>Kontakta oss!</button>
+        <button>Se Demo</button>
+      </div>
+    </div>
   </section>
 
-  <section class="included">
-    <h2>Vad ingår</h2>
-    <ul>
-      <li>AI-baserad lager- och beställningsprognos.</li>
-      <li>Personliga kundportaler & lojalitetssystem.</li>
-      <li>Chatbot för e-handel & kundsupport.</li>
-      <li>Automatiserade marknadsföringskampanjer & prenumerationstjänster.</li>
-    </ul>
-  </section>
-
+  <!-- BENEFITS GRID -->
   <section class="benefits">
-    <h2>Fördelar / Resultat</h2>
-    <ul>
-      <li>Minskad svinn och bättre lageromsättning.</li>
-      <li>Ökad kundlojalitet genom personliga erbjudanden.</li>
-      <li>Färre kundservice-ärenden tack vare chatbot.</li>
-    </ul>
-    <p class="citation">Källor: AI-driven demand forecasting minskar forecast-fel och förbättrar lageromsättning. :contentReference[oaicite:1]{index=1}</p>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Minskad svinn">
+        <h3>Minskad Svinn</h3>
+        <p>AI drivna prognoser och automatiserade beställningar minskar svinn och fel i lagerhantering, vilket ökar lönsamheten och sparar resurser.</p>
+      </div>
+
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Bättre kundupplevelse">
+        <h3>Bättre Kundupplevelse</h3>
+        <p>Personliga erbjudanden, kundportaler och snabbare service ger en smidigare shoppingupplevelse som ökar kundlojaliteten.</p>
+      </div>
+
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Optimerad logistik">
+        <h3>Optimerad Logistik</h3>
+        <p>Automatiserade flöden och intelligenta inköpssystem säkerställer att rätt varor finns på rätt plats vid rätt tidpunkt, vilket sparar både tid och pengar.</p>
+      </div>
+
+      <div class="benefit-card">
+        <img src="/images/placeholder.png" alt="Skalbara lösningar">
+        <h3>Skalbara Lösningar</h3>
+        <p>Lösningarna växer med er verksamhet nya butiker, kampanjer eller kanaler integreras enkelt utan att störa befintliga system.</p>
+      </div>
+    </div>
   </section>
 
-  <section class="case">
-    <h2>Exempel / Case</h2>
-    <p><em>Demo-Butik</em> – Efter införande av prognoser minskade överlager och utplock med X% (demo-data).</p>
+  <!-- CTA -->
+  <section class="cta">
+    <a href="#"><button class="cta-button cta-cases">Boka en gratis konsultation</button></a>
+    <a href="/html/index.html#our_industries"><button class="cta-button cta-book">Se lösningar för andra branscher</button></a>
   </section>
 
-  <section class="faq">
-    <h2>Vanliga frågor</h2>
-    <ul>
-      <li><strong>Behöver vi historisk data?</strong> – Ja, data höjer träffsäkerheten men modellen kan börja med basal försäljningsdata och sedan förbättras.</li>
-      <li><strong>Kan vi köra prenumerationstjänster?</strong> – Ja, vi bygger lösningar för matkassar och återkommande leveranser.</li>
-    </ul>
-  </section>
-  
-<div class="cta">
-    <a href="#"> <button class="cta-button cta-cases">Boka en gratis konsultation</button></a>
-    <a href="#" class="cta-button cta-book">Se lösningar till din bransch</a>
-    
-</div>
-</main>
+  <footer>
+    <p>&copy; 2024 Waz Go. Alla rättigheter förbehållna.</p>
+  </footer>
 
 </body>
 </html>
