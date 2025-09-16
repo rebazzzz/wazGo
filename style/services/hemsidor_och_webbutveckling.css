@@ -1,0 +1,195 @@
+/* Hero för undersidor */
+.sub-hero {
+  padding: 6rem 2rem 0 2rem;
+  background: var(--white);
+  border-bottom: 1px solid #eee;
+}
+
+.sub-hero h1 {
+  font-size: 3rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 1rem;
+}
+
+.sub-hero p {
+  font-size: 1.3rem;
+  color: var(--text-dark);
+  max-width: 65ch;
+  line-height: 1.6;
+}
+
+
+/* Sektioner */
+.overview {
+  padding: 4rem 2rem;
+  max-width: 70rem;
+  margin: 0 auto;
+}
+
+.overview h2 {
+  font-size: 2.25rem;
+  font-family: var(--font-heading);
+  color: var(--green-dark);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+#highlight_text {
+  margin-bottom: 1.25rem;
+}
+
+.highlight {
+  background-color: var(--yellow-light);
+  border-radius: 4px;
+  font-weight: 550;
+}
+
+.overview p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text-dark);
+  margin: 0 auto;
+}
+
+/* Wrapper för lista + bild */
+.overview-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.overview-content ul {
+  flex: 1;
+  list-style: none;
+  padding-left: 0;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  margin: 1.5rem 0;
+}
+
+.overview-content li {
+  position: relative;
+  padding-left: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.overview-content li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: green;
+  font-weight: bold;
+}
+
+.overview-content button {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  color: var(--white);
+  background-color: var(--green-dark);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.overview-content .webbdev-image {
+  flex: 1;
+}
+
+.overview-content .webbdev-image img {
+  width: 100%;
+  aspect-ratio: 4 / 3;   /* styr proportionerna (ändra t.ex. till 16/9 eller 3/2 om du vill ha kortare) */
+  object-fit: cover;     /* beskär bilden om den inte passar perfekt */
+  max-height: 285px;     /* begränsar höjden så att den inte blir för lång */
+  border-radius: 8px;
+}
+
+
+.benefits {
+  padding: 4rem 2rem;
+  background: var(--white);
+  text-align: center;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* två kolumner, två rader */
+  gap: 2.5rem;
+  max-width: 90rem;
+  margin: 0 auto;
+  row-gap: 1rem; /* mindre vertikalt avstånd mellan rader */
+  column-gap: 2.5rem; /* behåller avståndet mellan kolumner */
+  /* margin-top: 1rem; avstånd ovanför hela griden */
+}
+
+.benefit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 1.5rem;
+}
+
+.benefit-card img {
+  width: 60px;
+  height: 60px;
+}
+
+.benefit-card h3 {
+  font-size: 1.4rem;
+  color: var(--green-dark);
+  margin-bottom: 0.75rem;
+  font-family: var(--font-heading);
+}
+
+.benefit-card p {
+  font-size: 1.05rem;
+  color: var(--text-dark);
+  line-height: 1.65;
+}
+
+/* Responsiv */
+@media (max-width: 768px) {
+  .benefits-grid {
+    grid-template-columns: 1fr; /* alla under varandra på mobil */
+  }
+}
+
+
+/* CTA */
+.cta {
+  text-align: center;
+  color: var(--white);
+  margin-top: 0;
+
+}
+
+.cta-button {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  margin: 0.5rem;
+  cursor: pointer;
+}
+
+.cta-cases {
+  background: var(--green-light);
+  color: var(--white);
+}
+
+.cta-book {
+  background: var(--white);
+  color: var(--green-dark);
+}
+
+.cta-button:hover {
+  transform: scale(1.05);
+  transition: all 0.2s ease-in-out;
+}

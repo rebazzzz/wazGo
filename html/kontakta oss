@@ -1,0 +1,22 @@
+
+  <!-- PROCESS -->
+  <section class="process">
+    <h2>Så jobbar vi</h2>
+    <ol>
+      <li>Behovsanalys och mål</li>
+      <li>Design och UX-planering</li>
+      <li>Utveckling & Implementation</li>
+      <li>Testning & kvalitetssäkring</li>
+      <li>Lansering & uppföljning</li>
+    </ol>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <h2>Vanliga frågor</h2>
+    <ul>
+      <li><strong>Hur lång tid tar det?</strong> – Vanligtvis 3–6 veckor beroende på omfattning.</li>
+      <li><strong>Kan ni uppdatera vår nuvarande hemsida?</strong> – Ja, vi kan bygga vidare på befintliga lösningar eller skapa nytt från grunden.</li>
+      <li><strong>Behöver vi teknisk kunskap?</strong> – Nej, vi hanterar all teknik och guidar dig genom processen.</li>
+    </ul>
+  </section>
