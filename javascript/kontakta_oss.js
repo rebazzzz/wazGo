@@ -71,3 +71,17 @@ document.querySelectorAll('footer a[data-industry]').forEach(link => {
         window.location.href = 'index.html#industries';
     });
 });
+
+// Smooth scroll för Process-sektionen
+document.querySelectorAll('a[href^="#process"], a[href^="#step"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const target = document.getElementById(targetId);
+        if(target){
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const offsetTop = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+            window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+        }
+    });
+});
