@@ -12,9 +12,9 @@
 .contact-instructions {
     background-color: #fef9f4;
     border-left: 4px solid var(--accent);
-    padding: 20px 25px;
+    padding: 1.25rem 1.563rem;
     border-radius: 8px;
-    margin-bottom: 30px;
+    margin-bottom: 1.875rem;
     font-size: 1.1rem;
     color: var(--secondary);
     line-height: 1.5;
@@ -24,7 +24,7 @@
 .contact-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 40px;
+    gap: 2.5rem;
     justify-content: space-between;
 }
 
@@ -36,7 +36,7 @@
 .contact-form .form-group textarea,
 .contact-form .form-group select {
     width: 100%;
-    padding: 12px 15px;
+    padding: 0.75rem 0.938rem;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-family: 'Open Sans', sans-serif;
@@ -54,7 +54,7 @@
 .contact-form button {
     background-color: var(--primary);
     color: var(--white);
-    padding: 12px 28px;
+    padding: 0.75rem 1.75rem;
     border-radius: 50px;
     border: none;
     font-weight: 600;
@@ -69,22 +69,22 @@
 
 /* Ta bort bakgrund från process-sektionen */
 .process {
-    padding: 30px 0;
-    margin-bottom: 40px;
+    padding: 1.875rem 0;
+    margin-bottom: 2.5rem;
 }
 
 /* Process steg */
 .process-steps {
     display: flex;
     flex-wrap: wrap;
-    gap: 30px;
+    gap: 1.875rem;
     justify-content: space-between;
 }
 
 .process-step {
     flex: 1 1 220px;
     background-color: #fff; /* vit bakgrund */
-    padding: 25px;
+    padding: 1.563rem;
     border-radius: 10px;
     border-left: 5px solid var(--accent);
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -93,7 +93,7 @@
 
 .process-step h3 {
     color: var(--primary);
-    margin-bottom: 10px;
+    margin-bottom: 0.625rem;
     font-size: 1.3rem;
 }
 
