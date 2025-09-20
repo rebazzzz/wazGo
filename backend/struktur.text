@@ -1,0 +1,22 @@
+backend/
+│
+├─ config/
+│   └─ db.js          # databasanslutning
+│
+├─ controllers/
+│   ├─ contactController.js
+│   └─ adminController.js
+│
+├─ routes/
+│   ├─ contactRoutes.js
+│   └─ adminRoutes.js
+│
+├─ middleware/
+│   ├─ authMiddleware.js
+│   └─ errorMiddleware.js
+│
+├─ utils/
+│   └─ mailer.js
+│
+├─ .env               # hemligheter och DB credentials
+└─ server.js
