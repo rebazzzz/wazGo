@@ -1,0 +1,72 @@
+.booking-page {
+  padding: 3rem 2rem;
+  max-width: 70rem;
+  margin: 0 auto;
+}
+
+.booking-page header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.booking-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.booking-page label,
+.booking-page legend {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.booking-page input,
+.booking-page select,
+.booking-page textarea,
+.booking-page button {
+  font-family: var(--font-heading);
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.booking-page textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.booking-page button {
+  background-color: var(--green-dark);
+  color: var(--white);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.booking-page button:hover {
+  transform: scale(1.05);
+}
+
+fieldset {
+  border: 1px solid #eee;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+fieldset label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+textarea[name="custom-services"] {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .booking-page {
+    padding: 2rem 1rem;
+  }
+}

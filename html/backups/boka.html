@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waz Go / Boka möte</title>
+  <link rel="stylesheet" href="/style/index.css">
+  <link rel="stylesheet" href="/style/backups/boka.css">
+</head>
+<body>
+
+<nav>
+  <a href="/html/index.html"><img id="logo" src="/images/placeholder.png" alt="Waz Go Logo"></a>
+  <div class="nav__links">
+    <a href="/html/index.html#our_services">Tjänster</a>
+    <a href="/html/index.html#our_industries">Branscher</a>
+    <a href="#">Portfolio / Demo</a>
+    <a href="#">Om oss</a>
+    <button id="nav__button">Boka möte</button>
+  </div>
+</nav>
+
+<main class="booking-page">
+  <header class="sub-hero">
+    <h1>Boka ett möte</h1>
+    <p>Fyll i formuläret nedan så återkommer vi med ett förslag på mötestid och lösningar skräddarsydda för din verksamhet.</p>
+  </header>
+
+  <section class="booking-form">
+    <form>
+      <!-- Bransch -->
+      <label for="industry">Vilken bransch tillhör du?</label>
+      <select id="industry" name="industry" onchange="toggleOtherIndustry()">
+        <option value="">-- Välj bransch --</option>
+        <option value="restauranger">Restauranger & Caféer</option>
+        <option value="matbutiker">Mat- & dagligvaruhandel</option>
+        <option value="bygg">Bygg & Fastighet</option>
+        <option value="stadfirma">Städfirma</option>
+        <option value="other">Annat</option>
+      </select>
+      <input type="text" id="other-industry" name="other-industry" placeholder="Ange din bransch" style="display:none;">
+
+      <!-- Tjänster -->
+      <fieldset>
+        <legend>Vilka tjänster är du intresserad av?</legend>
+        <label><input type="checkbox" name="services" value="webb"> Hemsidor & Webbutveckling</label>
+        <label><input type="checkbox" name="services" value="ai"> AI & Automatisering</label>
+        <label><input type="checkbox" name="services" value="system"> Systemutveckling</label>
+        <label><input type="checkbox" name="services" value="custom"> Andra tjänster / skräddarsydda lösningar</label>
+        <textarea name="custom-services" placeholder="Beskriv andra tjänster" style="display:none;"></textarea>
+      </fieldset>
+
+      <!-- Kontakt -->
+      <label for="name">Namn</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">E-post</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="message">Meddelande / kommentarer</label>
+      <textarea id="message" name="message" placeholder="T.ex. beskriv projektet eller önskemål"></textarea>
+
+      <button type="submit">Skicka bokningsförfrågan</button>
+    </form>
+  </section>
+</main>
+
+<script>
+  function toggleOtherIndustry() {
+    const industrySelect = document.getElementById('industry');
+    const otherInput = document.getElementById('other-industry');
+    otherInput.style.display = (industrySelect.value === 'other') ? 'block' : 'none';
+  }
+
+  const customCheckbox = document.querySelector('input[value="custom"]');
+  const customTextarea = document.querySelector('textarea[name="custom-services"]');
+  customCheckbox.addEventListener('change', function() {
+    customTextarea.style.display = this.checked ? 'block' : 'none';
+  });
+</script>
+
+</body>
+</html>
