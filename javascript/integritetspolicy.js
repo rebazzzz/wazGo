@@ -11,12 +11,36 @@ if (mobileMenuBtn && navMenu) {
 }
 
 // === Smooth scrolling for anchor links ===
+// document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+//     anchor.addEventListener('click', function(e) {
+//         e.preventDefault();
+
+//         const targetId = this.getAttribute('href');
+//         if (targetId === '#') return;
+
+//         const targetElement = document.querySelector(targetId);
+//         if (targetElement) {
+//             const headerHeight = document.querySelector('header').offsetHeight;
+//             const elementPosition = targetElement.getBoundingClientRect().top;
+//             const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+
+//             window.scrollTo({
+//                 top: offsetPosition,
+//                 behavior: 'smooth'
+//             });
+//         }
+
+//         if (navMenu) navMenu.classList.remove('active');
+//     });
+// });
+
+// === Smooth scrolling for anchors (only on this page) ===
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
         e.preventDefault();
 
         const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
+        if (!targetId || targetId === '#') return;
 
         const targetElement = document.querySelector(targetId);
         if (targetElement) {
@@ -31,6 +55,22 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
 
         if (navMenu) navMenu.classList.remove('active');
+    });
+});
+
+
+// === Footer links → redirect to index.html with selected industry ===
+document.querySelectorAll('footer a[data-industry]').forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        const industry = link.getAttribute('data-industry');
+        if (!industry) return;
+
+        // Spara valt industry i localStorage
+        localStorage.setItem('selectedIndustry', industry);
+
+        // Gå till index.html
+        window.location.href = 'index.html#industries';
     });
 });
 
