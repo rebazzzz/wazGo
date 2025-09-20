@@ -1,15 +1,20 @@
-<% layout('layout', {title:'Redigera sida'}) %>
 <h2>Redigera sida: <%= page.slug %></h2>
 
 <form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
   <label>Titel</label><br/>
   <input type="text" name="title" value="<%= page.title %>" style="width:100%"/><br/><br/>
+
   <label>Innehåll (HTML)</label><br/>
   <textarea name="content" rows="10" style="width:100%"><%= page.content %></textarea><br/><br/>
+
   <label>Bild (valfritt)</label><br/>
   <input type="file" name="image"/><br/><br/>
+
   <% if (page.image) { %>
     <img src="/<%= page.image %>" alt="page image" style="max-width:200px;"><br/><br/>
   <% } %>
+
   <button type="submit">Spara</button>
 </form>

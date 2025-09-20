@@ -1,12 +1,19 @@
-<% layout('layout', {title: 'Logga in'}) %>
 <h2>Admin login</h2>
-<% if (error) { %>
-  <div style="background:#ffe6e6;padding:10px;border-radius:4px;color:#900"><%= error %></div>
+
+<% if (error && error.length > 0) { %>
+  <div style="background:#ffe6e6;padding:10px;border-radius:4px;color:#900">
+    <%= error[0] %>
+  </div>
 <% } %>
+
 <form method="post" action="/admin/login">
-  <label>E-post</label><br/>
-  <input type="email" name="email" required/><br/><br/>
-  <label>Lösenord</label><br/>
-  <input type="password" name="password" required/><br/><br/>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <label for="email">E-post</label><br/>
+  <input type="email" id="email" name="email" required/><br/><br/>
+
+  <label for="password">Lösenord</label><br/>
+  <input type="password" id="password" name="password" required/><br/><br/>
+
   <button type="submit">Logga in</button>
 </form>

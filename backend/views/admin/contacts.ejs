@@ -1,7 +1,17 @@
-<% layout('layout', {title:'Kontakter'}) %>
 <h2>Kontakter</h2>
+
 <table border="1" cellpadding="8" cellspacing="0">
-  <thead><tr><th>ID</th><th>Namn</th><th>Email</th><th>Företag</th><th>Bransch</th><th>Meddelande</th><th>Datum</th></tr></thead>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Namn</th>
+      <th>Email</th>
+      <th>Företag</th>
+      <th>Bransch</th>
+      <th>Meddelande</th>
+      <th>Datum</th>
+    </tr>
+  </thead>
   <tbody>
     <% contacts.forEach(c => { %>
       <tr>
@@ -11,7 +21,7 @@
         <td><%= c.company %></td>
         <td><%= c.industry %> <%= c.otherIndustry ? '('+c.otherIndustry+')' : '' %></td>
         <td><%= c.message %></td>
-        <td><%= c.createdAt %></td>
+        <td><%= c.createdAt.toLocaleString() %></td>
       </tr>
     <% }) %>
   </tbody>
