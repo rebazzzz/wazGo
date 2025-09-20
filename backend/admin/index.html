@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel – Waz Go</title>
+</head>
+<body>
+<h2>Admin Login</h2>
+<form id="loginForm">
+    <input type="text" id="username" placeholder="Användarnamn" required>
+    <input type="password" id="password" placeholder="Lösenord" required>
+    <button type="submit">Logga in</button>
+</form>
+
+<h2>Kontaktförfrågningar</h2>
+<ul id="contactsList"></ul>
+
+<script>
+const loginForm = document.getElementById('loginForm');
+const contactsList = document.getElementById('contactsList');
+
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+        alert('Inloggad!');
+        fetchContacts(data.token);
+    } else {
+        alert(data.message);
+    }
+});
+
+async function fetchContacts(token) {
+    const res = await fetch('/api/admin/contacts', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const contacts = await res.json();
+    contactsList.innerHTML = contacts.map(c => `<li>${c.name} – ${c.email} – ${c.message}</li>`).join('');
+}
+</script>
+</body>
+</html>
