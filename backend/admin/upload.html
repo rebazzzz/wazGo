@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Upload – Waz Go</title>
+</head>
+<body>
+<h2>Ladda upp bilder</h2>
+
+<form id="uploadForm">
+    <input type="file" name="file" id="fileInput">
+    <button type="submit">Ladda upp</button>
+</form>
+
+<div id="uploadedFile"></div>
+
+<script>
+let csrfToken = '';
+fetch('/api/csrf-token')
+    .then(res => res.json())
+    .then(data => csrfToken = data.csrfToken);
+
+const form = document.getElementById('uploadForm');
+const uploadedFile = document.getElementById('uploadedFile');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file) return alert('Välj en fil');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = localStorage.getItem('adminToken');
+
+    const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'CSRF-Token': csrfToken, 'Authorization': 'Bearer ' + token },
+        body: formData
+    });
+
+    const data = await res.json();
+    uploadedFile.innerHTML = `<p>${data.message}</p><img src="${data.path}" width="200">`;
+});
+</script>
+</body>
+</html>

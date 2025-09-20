@@ -1,0 +1,12 @@
+<% layout('layout', {title: 'Logga in'}) %>
+<h2>Admin login</h2>
+<% if (error) { %>
+  <div style="background:#ffe6e6;padding:10px;border-radius:4px;color:#900"><%= error %></div>
+<% } %>
+<form method="post" action="/admin/login">
+  <label>E-post</label><br/>
+  <input type="email" name="email" required/><br/><br/>
+  <label>Lösenord</label><br/>
+  <input type="password" name="password" required/><br/><br/>
+  <button type="submit">Logga in</button>
+</form>

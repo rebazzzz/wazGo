@@ -85,3 +85,37 @@ document.querySelectorAll('a[href^="#process"], a[href^="#step"]').forEach(ancho
         }
     });
 });
+
+// frontend kontakt.js (sample)
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(contactForm);
+    // if your backend uses cookie-based CSRF token, read cookie (res.locals.csrfToken available when serving page)
+    // If you render the contact page from backend you can inject csrf token; for static: fetch from server root first.
+    // Example: fetch csrf token from server root
+    try {
+      const root = await fetch('/');
+      const rootJson = await root.json();
+      const csrfToken = rootJson.csrfToken; // server returns token if route set up so
+      if (csrfToken) formData.append('_csrf', csrfToken);
+    } catch (err) {
+      // ignore
+    }
+
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      body: formData
+    });
+
+    const json = await res.json();
+    if (json.success) {
+      alert(json.message || 'Tack!');
+      contactForm.reset();
+    } else {
+      alert(json.error || 'Något gick fel.');
+    }
+  });
+}

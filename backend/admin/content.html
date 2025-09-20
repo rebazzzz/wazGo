@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Content – Waz Go</title>
+</head>
+<body>
+<h2>Redigera hemsidans innehåll</h2>
+
+<select id="pageSelect">
+    <option value="index">Hem</option>
+    <option value="kontakta_oss">Kontakta Oss</option>
+    <option value="integritetspolicy">Integritetspolicy</option>
+</select>
+
+<div id="sectionsContainer"></div>
+
+<script>
+let csrfToken = '';
+fetch('/api/csrf-token')
+    .then(res => res.json())
+    .then(data => csrfToken = data.csrfToken);
+
+const pageSelect = document.getElementById('pageSelect');
+const sectionsContainer = document.getElementById('sectionsContainer');
+
+pageSelect.addEventListener('change', () => loadContent(pageSelect.value));
+loadContent(pageSelect.value);
+
+async function loadContent(page) {
+    sectionsContainer.innerHTML = '';
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch(`/api/content/${page}`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const contents = await res.json();
+
+    contents.forEach(c => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <h3>${c.section}</h3>
+            <textarea id="${c.section}">${c.content}</textarea>
+            <button onclick="updateContent('${page}', '${c.section}')">Spara</button>
+        `;
+        sectionsContainer.appendChild(div);
+    });
+}
+
+async function updateContent(page, section) {
+    const content = document.getElementById(section).value;
+    const token = localStorage.getItem('adminToken');
+
+    await fetch(`/api/content/${page}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+            'CSRF-Token': csrfToken
+        },
+        body: JSON.stringify({ section, content })
+    });
+
+    alert('Uppdaterat!');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title><%= title || 'Admin' %> - Waz Go</title>
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+  <header style="padding:15px;background:#2C3E50;color:#fff;">
+    <div class="container">
+      <a href="/admin" style="color:white;text-decoration:none;font-weight:bold">Waz Go — Admin</a>
+      <nav style="float:right">
+        <% if (session && session.user) { %>
+          <a href="/admin" style="color:white;margin-right:10px">Dashboard</a>
+          <a href="/admin/contacts" style="color:white;margin-right:10px">Kontakter</a>
+          <a href="/admin/logout" style="color:white">Logga ut</a>
+        <% } %>
+      </nav>
+    </div>
+  </header>
+
+  <main style="padding:20px">
+    <div class="container">
+      <%= body %>
+    </div>
+  </main>
+</body>
+</html>
