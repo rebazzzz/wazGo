@@ -1,0 +1,76 @@
+/* Root-färger (ärv från huvud-CSS eller definiera här) */
+:root {
+    --primary: #2E8B57;
+    --primary-dark: #1F6E48;
+    --accent: #FF6B35;
+    --secondary: #2C3E50;
+    --white: #FFFFFF;
+}
+
+
+/* Kontaktinstruktioner */
+.contact-instructions {
+    background-color: #fef9f4;
+    border-left: 4px solid var(--accent);
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+    color: var(--secondary);
+    line-height: 1.5;
+}
+
+/* Kontaktsektion */
+.contact-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.contact-info, .contact-form {
+    flex: 1 1 400px;
+}
+
+.contact-form .form-group input,
+.contact-form .form-group textarea,
+.contact-form .form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.contact-form .form-group input:focus,
+.contact-form .form-group textarea:focus,
+.contact-form .form-group select:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.contact-form button {
+    background-color: var(--primary);
+    color: var(--white);
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.contact-form button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .contact-container {
+        flex-direction: column;
+    }
+}
+
