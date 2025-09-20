@@ -1,1 +1,1 @@
-# wazGo
+# Waz Go
