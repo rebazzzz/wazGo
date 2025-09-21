@@ -31,6 +31,58 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const industrySelect = document.getElementById('industry');
+  const otherIndustryGroup = document.getElementById('other-industry-group');
+
+  // Visa "Annan"-fältet om "other" är valt
+  industrySelect.addEventListener('change', () => {
+    otherIndustryGroup.style.display = industrySelect.value === 'other' ? 'block' : 'none';
+  });
+
+  const form = document.getElementById('contactForm');
+  const formMessage = document.getElementById('form-message');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Hämta värden
+    const formData = {
+      name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      company: document.getElementById('company').value.trim(),
+      industry: document.getElementById('industry').value,
+      otherIndustry: document.getElementById('other-industry').value.trim(),
+      message: document.getElementById('message').value.trim()
+    };
+
+    try {
+      const res = await fetch('/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        formMessage.style.color = 'green';
+        formMessage.textContent = data.message;
+        form.reset();
+        otherIndustryGroup.style.display = 'none';
+      } else {
+        formMessage.style.color = 'red';
+        formMessage.textContent = data.error || 'Ett fel uppstod.';
+      }
+    } catch (err) {
+      console.error(err);
+      formMessage.style.color = 'red';
+      formMessage.textContent = 'Kunde inte skicka meddelande. Försök igen senare.';
+    }
+  });
+});
+
+
 // === Contact form submission with professional message ===
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
