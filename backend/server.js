@@ -1,9 +1,9 @@
+// server.js
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import csrf from "csurf";
 import cookieParser from "cookie-parser";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -26,32 +26,54 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// === CSRF skydd ===
-const csrfProtection = csrf({ cookie: true });
-app.use(csrfProtection);
-
-// === Static frontend ===
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
+// === View engine ===
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // === Initiera modeller ===
 Contact.initModel(sequelize);
 
+// === Static frontend ===
+app.use(express.static(path.join(__dirname, 'public'))); // index, kontakta_oss, integritetspolicy
+app.use('/admin/static', express.static(path.join(__dirname, 'public', 'admin'))); // admin statiska filer
+
+// === CSRF middleware ===
+const csrfProtection = csrf({ cookie: true });
+
 // === Kontakt routes ===
-app.use('/contact', contactRoutes);
+app.use('/contact', contactRoutes); // kontakt.js hanterar sitt eget CSRF
 
 // === Frontend routes ===
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get("/kontakta_oss", (req, res) => res.sendFile(path.join(__dirname, 'public', 'kontakta_oss.html')));
 app.get("/integritetspolicy", (req, res) => res.sendFile(path.join(__dirname, 'public', 'integritetspolicy.html')));
 
-// === Admin routes (EJS) ===
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// === Admin routes ===
 
-// Admin login
-app.get('/admin/login', (req, res) => {
-  res.render('admin/login');
+// Redirect /admin → /admin/login
+app.get('/admin', (req, res) => res.redirect('/admin/login'));
+
+// GET login
+app.get('/admin/login', csrfProtection, (req, res) => {
+  res.render('admin/login', {
+    error: [],
+    csrfToken: req.csrfToken()
+  });
+});
+
+// POST login
+app.post('/admin/login', csrfProtection, (req, res) => {
+  const { username, password } = req.body;
+
+  // Trimma för säkerhet
+  if (username?.trim() === process.env.ADMIN_EMAIL && password?.trim() === process.env.ADMIN_PASS) {
+    res.redirect('/admin/contacts');
+  } else {
+    res.render('admin/login', {
+      error: ['Felaktigt användarnamn eller lösenord'],
+      csrfToken: req.csrfToken()
+    });
+  }
 });
 
 // Admin dashboard med alla kontakter
