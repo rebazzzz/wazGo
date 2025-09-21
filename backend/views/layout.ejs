@@ -3,39 +3,46 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title><%= title || 'Admin' %> - Waz Go</title>
-  <link rel="stylesheet" href="/static/admin.css">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <title><%= title || 'Waz Go' %></title>
+
+  <!-- CSS - behåll dina ursprungliga CSS i /public/static -->
+  <link rel="stylesheet" href="/static/index.css">
+  <link rel="stylesheet" href="/static/kontakta_oss.css">
+  <link rel="stylesheet" href="/static/integritetspolicy.css">
+  <link rel="stylesheet" href="/static/admin.css"> <!-- admin css -->
+  
+  <!-- Din globala JS (defer så DOM finns) -->
+  <script src="/static/index.js" defer></script>
+  <script src="/static/kontakta_oss.js" defer></script>
+  <script src="/static/integritetspolicy.js" defer></script>
 </head>
 <body>
-  <header style="padding:15px;background:#2C3E50;color:#fff;">
-    <div class="container">
-      <a href="/admin" style="color:white;text-decoration:none;font-weight:bold">Waz Go — Admin</a>
-      <nav style="float:right">
-        <% if (session && session.user) { %>
-          <a href="/admin" style="color:white;margin-right:10px">Dashboard</a>
-          <a href="/admin/contacts" style="color:white;margin-right:10px">Kontakter</a>
-          <a href="/admin/logout" style="color:white">Logga ut</a>
-        <% } %>
-      </nav>
-    </div>
+  <header>
+    <!-- enklare header, byt ut mot din HTML -->
+    <nav>
+      <a href="/">Hem</a>
+      <a href="/kontakta_oss">Kontakt</a>
+      <a href="/integritetspolicy">Integritet</a>
+      <a href="/admin">Admin</a>
+    </nav>
   </header>
 
-  <main style="padding:20px">
-    <div class="container">
-      <% if (success && success.length > 0) { %>
-        <div style="background:#e6ffe6;padding:10px;border-radius:4px;color:#090">
-          <%= success[0] %>
-        </div>
-      <% } %>
+  <main>
+    <!-- flash-meddelanden -->
+    <% if (success && success.length > 0) { %>
+      <div class="flash flash-success"><%= success[0] %></div>
+    <% } %>
+    <% if (error && error.length > 0) { %>
+      <div class="flash flash-error"><%= error[0] %></div>
+    <% } %>
 
-      <% if (error && error.length > 0) { %>
-        <div style="background:#ffe6e6;padding:10px;border-radius:4px;color:#900">
-          <%= error[0] %>
-        </div>
-      <% } %>
-
-      <%- body %>
-    </div>
+    <!-- Här renderas sidans innehåll -->
+    <%- body %>
   </main>
+
+  <footer>
+    <p>© Waz Go</p>
+  </footer>
 </body>
 </html>

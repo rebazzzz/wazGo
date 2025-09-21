@@ -1,0 +1,9 @@
+<!-- views/index.ejs -->
+<h1><%= page && page.title ? page.title : 'Välkommen till Waz Go' %></h1>
+
+<% if (page && page.content) { %>
+  <!-- Om sidan innehåller HTML och du vill rendera raw HTML: -->
+  <%- page.content %>
+<% } else { %>
+  <p>Här är din startsida. Ersätt med ditt innehåll.</p>
+<% } %>

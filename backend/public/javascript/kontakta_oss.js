@@ -8,11 +8,10 @@ if (mobileMenuBtn && navMenu) {
     });
 }
 
-// === Smooth scrolling for anchors (only on this page) ===
+// === Smooth scrolling for anchors ===
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
         e.preventDefault();
-
         const targetId = this.getAttribute('href');
         if (!targetId || targetId === '#') return;
 
@@ -32,13 +31,47 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// === Contact form submission ===
+// === Contact form submission with professional message ===
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
-    contactForm.addEventListener('submit', e => {
+    contactForm.addEventListener('submit', async e => {
         e.preventDefault();
-        alert('Tack för ditt meddelande! Vi återkommer så snart som möjligt.');
-        contactForm.reset();
+
+        const formMessage = document.getElementById('form-message');
+        formMessage.classList.remove('success', 'error', 'show');
+
+        const formData = new FormData(contactForm);
+
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                body: formData
+            });
+
+            const json = await res.json();
+
+            if (json.success) {
+                formMessage.textContent = json.message || 'Tack! Vi återkommer snart.';
+                formMessage.classList.add('success', 'show');
+                contactForm.reset();
+            } else {
+                formMessage.textContent = json.error || 'Något gick fel, försök igen.';
+                formMessage.classList.add('error', 'show');
+            }
+
+            // Dölj meddelandet efter 5 sekunder
+            setTimeout(() => {
+                formMessage.classList.remove('show');
+            }, 5000);
+
+        } catch (err) {
+            console.error("Kontaktformulärfel:", err);
+            formMessage.textContent = 'Något gick fel, försök igen.';
+            formMessage.classList.add('error', 'show');
+            setTimeout(() => {
+                formMessage.classList.remove('show');
+            }, 5000);
+        }
     });
 }
 
@@ -64,10 +97,7 @@ document.querySelectorAll('footer a[data-industry]').forEach(link => {
         const industry = link.getAttribute('data-industry');
         if (!industry) return;
 
-        // Spara valt industry i localStorage
         localStorage.setItem('selectedIndustry', industry);
-
-        // Gå till index.html
         window.location.href = 'index.html#industries';
     });
 });
@@ -85,37 +115,3 @@ document.querySelectorAll('a[href^="#process"], a[href^="#step"]').forEach(ancho
         }
     });
 });
-
-// frontend kontakt.js (sample)
-
-if (contactForm) {
-  contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(contactForm);
-    // if your backend uses cookie-based CSRF token, read cookie (res.locals.csrfToken available when serving page)
-    // If you render the contact page from backend you can inject csrf token; for static: fetch from server root first.
-    // Example: fetch csrf token from server root
-    try {
-      const root = await fetch('/');
-      const rootJson = await root.json();
-      const csrfToken = rootJson.csrfToken; // server returns token if route set up so
-      if (csrfToken) formData.append('_csrf', csrfToken);
-    } catch (err) {
-      // ignore
-    }
-
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      body: formData
-    });
-
-    const json = await res.json();
-    if (json.success) {
-      alert(json.message || 'Tack!');
-      contactForm.reset();
-    } else {
-      alert(json.error || 'Något gick fel.');
-    }
-  });
-}

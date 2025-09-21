@@ -1,35 +1,42 @@
-// controllers/contactController.js
-const db = require('../models');
-const { sendContactNotification } = require('../utils/mailer');
+const nodemailer = require('nodemailer');
+const db = require('../models'); // om du vill spara i DB
 
-const Contact = db.Contact;
-
-const handleContact = async (req, res) => {
+exports.submitContact = async (req, res) => {
   try {
     const { name, email, company, industry, otherIndustry, message } = req.body;
-    const filePath = req.file ? req.file.path : null;
 
-    // Basic server-side validation
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: 'Namn, e-post och meddelande krävs.' });
-    }
-
-    const contact = await Contact.create({
-      name, email, company, industry, otherIndustry, message, filePath
+    // Spara i DB (om du vill)
+    await db.Contact.create({
+      name,
+      email,
+      company,
+      industry: industry === 'other' ? otherIndustry : industry,
+      message
     });
 
-    // send notification email (fire and forget)
-    try {
-      await sendContactNotification(contact);
-    } catch (mailErr) {
-      console.error('Mail send error', mailErr);
-    }
+    // Skicka e-post via Gmail
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
 
-    return res.json({ success: true, message: 'Tack! Vi återkommer inom kort.' });
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: process.env.SMTP_USER, // skickas till dig själv
+      subject: `Ny kontaktförfrågan från ${name}`,
+      text: `Namn: ${name}\nEmail: ${email}\nFöretag: ${company}\nBransch: ${industry}\nMeddelande:\n${message}`
+    });
+
+    req.flash('success', 'Tack för ditt meddelande! Vi återkommer snart.');
+    res.redirect('/contact');
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Serverfel' });
+    req.flash('error', 'Något gick fel, försök igen senare.');
+    res.redirect('/contact');
   }
 };
-
-module.exports = { handleContact };

@@ -1,5 +1,4 @@
-// models/Contact.js
-const { DataTypes, Model } = require('sequelize');
+import { DataTypes, Model } from 'sequelize';
 
 class Contact extends Model {
   static initModel(sequelize) {
@@ -11,7 +10,7 @@ class Contact extends Model {
       industry: { type: DataTypes.STRING },
       otherIndustry: { type: DataTypes.STRING },
       message: { type: DataTypes.TEXT, allowNull: false },
-      filePath: { type: DataTypes.STRING }, // optional uploaded file
+      filePath: { type: DataTypes.STRING },
       createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
     }, {
       sequelize,
@@ -23,4 +22,4 @@ class Contact extends Model {
   }
 }
 
-module.exports = Contact;
+export default Contact;

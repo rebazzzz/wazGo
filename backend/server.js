@@ -1,97 +1,77 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
-const session = require('express-session');
-const pgSession = require('connect-pg-simple')(session);
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const csrf = require('csurf');
-const expressLayouts = require('express-ejs-layouts');
-const flash = require('connect-flash');
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import csrf from "csurf";
+import cookieParser from "cookie-parser";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// DB
-const db = require('./models');
+import sequelize from './config/database.js';
+import Contact from './models/Contact.js';
+import contactRoutes from './routes/contact.js';
 
-// Routes
-const apiRoutes = require('./routes/api');
-const adminRoutes = require('./routes/admin');
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ---------- Middleware ----------
-app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// === Middleware ===
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(expressLayouts);
 
-// Static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/static', express.static(path.join(__dirname, 'public', 'static')));
+// === CSRF skydd ===
+const csrfProtection = csrf({ cookie: true });
+app.use(csrfProtection);
 
-// ---------- Sessions ----------
-app.use(session({
-  store: new pgSession({
-    conString: `postgres://${process.env.DB_USER}:${encodeURIComponent(process.env.DB_PASS)}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
-    tableName: 'session' // default tabellnamn
-  }),
-  name: 'wazgo.sid',
-  secret: process.env.SESSION_SECRET || 'change_this',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false, // true om du kör https
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 // 1 dag
-  }
-}));
+// === Static frontend ===
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
 
-// ---------- Rate limiting ----------
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 120
-});
-app.use(limiter);
+// === Initiera modeller ===
+Contact.initModel(sequelize);
 
-// ---------- CSRF ----------
-app.use(csrf({ cookie: true }));
+// === Kontakt routes ===
+app.use('/contact', contactRoutes);
 
-// ---------- Flash ----------
-app.use(flash());
+// === Frontend routes ===
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get("/kontakta_oss", (req, res) => res.sendFile(path.join(__dirname, 'public', 'kontakta_oss.html')));
+app.get("/integritetspolicy", (req, res) => res.sendFile(path.join(__dirname, 'public', 'integritetspolicy.html')));
 
-// ---------- Gör flash, session och csrf tillgängliga i alla views ----------
-app.use((req, res, next) => {
-  res.locals.session = req.session;
-  res.locals.csrfToken = req.csrfToken();
-  res.locals.success = req.flash('success');
-  res.locals.error = req.flash('error');
-  next();
-});
-
-// ---------- EJS view engine ----------
-app.set('views', path.join(__dirname, 'views'));
+// === Admin routes (EJS) ===
 app.set('view engine', 'ejs');
-app.set('layout', 'layout'); // default layout.ejs i views-mappen
+app.set('views', path.join(__dirname, 'views'));
 
-// ---------- Routes ----------
-app.use('/api', apiRoutes);
-app.use('/admin', adminRoutes);
-
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', csrfToken: res.locals.csrfToken });
+// Admin login
+app.get('/admin/login', (req, res) => {
+  res.render('admin/login');
 });
 
-// ---------- Start server ----------
-(async () => {
+// Admin dashboard med alla kontakter
+app.get('/admin/contacts', async (req, res) => {
   try {
-    await db.syncDB(); // initiera databasen + skapa admin user om den saknas
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-      console.log('✅ DB connected');
-    });
+    const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
+    res.render('admin/contacts', { contacts });
   } catch (err) {
-    console.error('❌ Unable to start server', err);
+    console.error(err);
+    res.status(500).send('Fel vid hämtning av kontakter.');
   }
-})();
+});
+
+// === Start server ===
+app.listen(PORT, async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ Databasen är ansluten.');
+  } catch (err) {
+    console.error('❌ Fel vid databaskoppling:', err);
+  }
+  console.log(`Server körs på http://localhost:${PORT}`);
+});

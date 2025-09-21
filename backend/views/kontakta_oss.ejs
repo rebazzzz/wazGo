@@ -1,0 +1,95 @@
+<%- include('partials/header', { title: 'Kontakta oss – Waz Go' }) %>
+
+<section id="contact" class="contact">
+  <div class="container">
+    <div class="section-title">
+      <h2>Kontakta oss / Boka Möte</h2>
+    </div>
+
+    <% if (success && success.length > 0) { %>
+      <div class="flash success"><%= success[0] %></div>
+    <% } %>
+    <% if (error && error.length > 0) { %>
+      <div class="flash error"><%= error[0] %></div>
+    <% } %>
+
+    <div class="contact-instructions">
+      <p>Fyll i formuläret nedan om du vill boka ett möte eller om du har frågor. Vi återkommer så snart som möjligt.</p>
+    </div>
+
+    <div class="process">
+      <div class="process-steps">
+        <div id="step1" class="process-step">
+          <h3>1. Boka möte</h3>
+          <p>Fyll i formuläret eller kontakta oss direkt för att boka ett möte.</p>
+        </div>
+        <div id="step2" class="process-step">
+          <h3>2. Behovsanalys</h3>
+          <p>Vi analyserar era behov och identifierar de bästa lösningarna.</p>
+        </div>
+        <div id="step3" class="process-step">
+          <h3>3. Vi bygger</h3>
+          <p>Vi utvecklar och implementerar skräddarsydda digitala lösningar.</p>
+        </div>
+        <div id="step4" class="process-step">
+          <h3>4. Lansering & support</h3>
+          <p>Vi lanserar lösningen och erbjuder kontinuerlig support.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-container">
+      <div class="contact-info">
+        <h3>Kontaktinformation</h3>
+        <div class="contact-info-item">
+          <div class="contact-icon"><i class="fas fa-phone"></i></div>
+          <div><h4>Telefon</h4><p>08-123 45 67</p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+          <div><h4>E-post</h4><p>info@wazgo.se</p></div>
+        </div>
+      </div>
+
+      <div class="contact-form">
+        <h3>Skicka ett meddelande</h3>
+        <form id="contactForm" action="/contact" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-group">
+            <label for="name">Namn</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">E-post</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="company">Företag</label>
+            <input type="text" id="company" name="company">
+          </div>
+          <div class="form-group">
+            <label for="industry">Bransch</label>
+            <select id="industry" name="industry">
+              <option value="">Välj bransch</option>
+              <option value="restaurant">Restaurang/Café</option>
+              <option value="retail">Handel</option>
+              <option value="nonprofit">Ideell organisation</option>
+              <option value="other">Annan</option>
+            </select>
+          </div>
+          <div class="form-group" id="other-industry-group" style="display:none;">
+            <label for="other-industry">Ange bransch</label>
+            <input type="text" id="other-industry" name="otherIndustry">
+          </div>
+          <div class="form-group">
+            <label for="message">Meddelande</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
+          <button type="submit" class="btn">Skicka meddelande</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
