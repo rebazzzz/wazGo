@@ -1,54 +1,51 @@
-
 // routes/admin.js
 import express from 'express';
-import csrf from 'csurf';
 import multer from 'multer';
 import path from 'path';
-import adminCtrl from '../controllers/adminController.js';
-import { ensureAdmin } from '../middleware/auth.js';
-import db from '../models/index.js';
+import { fileURLToPath } from 'url';
+import csrf from 'csurf';
+import auth from '../middleware/auth.js';
+import * as adminController from '../controllers/adminController.js';
 
-const { Contact } = db;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
+const csrfProtection = csrf();
 
-// CSRF
-const csrfProtection = csrf({ cookie: true });
-
-// Multer storage för filuppladdningar
+// Multer config for uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => Date.now() + '-' + file.originalname
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../uploads'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
 });
 const upload = multer({ storage });
 
-// --- Login / Logout ---
-router.get('/login', csrfProtection, adminCtrl.showLogin);
-router.post('/login', csrfProtection, adminCtrl.doLogin);
-router.get('/logout', adminCtrl.logout);
+// Login
+router.get('/login', csrfProtection, adminController.showLogin);
+router.post('/login', csrfProtection, adminController.doLogin);
 
-// --- Dashboard ---
-router.get('/', ensureAdmin, adminCtrl.dashboard);
+// Protected routes
+router.use(auth);
 
-// --- Kontakter ---
-router.get('/contacts', ensureAdmin, csrfProtection, adminCtrl.listContacts);
+// Dashboard
+router.get('/dashboard', csrfProtection, adminController.showDashboard);
 
-// DELETE route för AJAX
-router.delete('/contacts/delete/:id', ensureAdmin, csrfProtection, async (req, res) => {
-  try {
-    const contact = await Contact.findByPk(req.params.id);
-    if (!contact) return res.json({ success: false, message: 'Kontakten finns inte.' });
+// Contacts
+router.get('/contacts', csrfProtection, adminController.showContacts);
+router.post('/contacts/delete', csrfProtection, adminController.deleteContact);
 
-    await contact.destroy();
-    res.json({ success: true, message: 'Kontakten raderades.' });
-  } catch (err) {
-    console.error(err);
-    res.json({ success: false, message: 'Fel vid radering.' });
-  }
-});
+// Pages
+router.get('/edit/:id', csrfProtection, adminController.showEditPage);
+router.post('/edit/:id', csrfProtection, adminController.updatePage);
 
-// --- Redigera sidor ---
-router.get('/pages/:slug?', ensureAdmin, adminCtrl.showEditPage);
-router.post('/pages/:slug?', ensureAdmin, upload.single('image'), adminCtrl.savePage);
+// Upload
+router.post('/upload', upload.single('image'), adminController.uploadImage);
+
+// Logout
+router.get('/logout', adminController.logout);
 
 export default router;

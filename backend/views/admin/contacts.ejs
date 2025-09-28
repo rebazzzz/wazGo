@@ -131,18 +131,24 @@
     confirmBtn.onclick = async () => {
       if (!currentContactId) return;
       try {
-        const res = await fetch(`/admin/contacts/delete/${currentContactId}`, {
-          method: 'DELETE',
+        const params = new URLSearchParams();
+        params.append('id', currentContactId);
+        params.append('_csrf', csrfToken);
+
+        const res = await fetch('/admin/contacts/delete', {
+          method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'CSRF-Token': csrfToken
-          }
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: params
         });
         const data = await res.json();
         if (data.success) {
           location.reload();
         } else {
-          alert(data.message);
+          alert(data.message || 'Fel vid radering');
         }
       } catch (err) {
         console.error(err);

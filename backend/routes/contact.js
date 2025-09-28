@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
     (async () => {
       try {
         // Nodemailer transport
-        const transporter = nodemailer.createTransport({
+        const transporter = nodemailer.createTransporter({
           host: process.env.SMTP_HOST,
           port: process.env.SMTP_PORT,
           secure: false, // true för 465, false för andra portar
