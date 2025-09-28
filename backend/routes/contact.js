@@ -7,7 +7,7 @@ import sequelize from '../config/database.js';
 const router = express.Router();
 
 // Initiera modellen med Sequelize-instans
-Contact.initModel(sequelize);
+// Contact.initModel(sequelize);
 
 // POST /contact – hantera formulär
 router.post('/', async (req, res) => {

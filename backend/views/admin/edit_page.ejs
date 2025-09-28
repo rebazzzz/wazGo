@@ -1,20 +1,63 @@
-<h2>Redigera sida: <%= page.slug %></h2>
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; }
+    .container { max-width: 900px; margin: 50px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; margin-bottom: 20px; }
+    form { display: flex; flex-direction: column; gap: 15px; }
+    label { font-weight: bold; }
+    input[type="text"], textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; }
+    textarea { height: 200px; resize: vertical; }
+    button { padding: 10px; background: #333; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #555; }
+    nav { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    nav a { margin-left: 15px; text-decoration: none; color: #333; }
+    .flash-success { background: #e6ffed; color: #2b7a0b; padding: 10px; border-radius: 4px; margin-bottom: 10px; text-align: center; }
+    .flash-error { background: #ffe6e6; color: #900; padding: 10px; border-radius: 4px; margin-bottom: 10px; text-align: center; }
+    .current-image { max-width: 200px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <span><%= session.user.email %> (<%= session.user.role %>)</span>
+      <a href="/admin/logout">Logga ut</a>
+      <a href="/admin">Dashboard</a>
+      <a href="/admin/contacts">Kontakter</a>
+    </nav>
 
-<form method="post" enctype="multipart/form-data">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <% if (flash.success && flash.success.length > 0) { %>
+      <div class="flash-success"><%= flash.success[0] %></div>
+    <% } %>
+    <% if (flash.error && flash.error.length > 0) { %>
+      <div class="flash-error"><%= flash.error[0] %></div>
+    <% } %>
 
-  <label>Titel</label><br/>
-  <input type="text" name="title" value="<%= page.title %>" style="width:100%"/><br/><br/>
+    <h1>Redigera sida: <%= page.title || page.slug %></h1>
 
-  <label>Innehåll (HTML)</label><br/>
-  <textarea name="content" rows="10" style="width:100%"><%= page.content %></textarea><br/><br/>
+    <form method="POST" action="/admin/pages/<%= page.slug %>" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-  <label>Bild (valfritt)</label><br/>
-  <input type="file" name="image"/><br/><br/>
+      <label for="title">Titel</label>
+      <input type="text" id="title" name="title" value="<%= page.title %>" required>
 
-  <% if (page.image) { %>
-    <img src="/<%= page.image %>" alt="page image" style="max-width:200px;"><br/><br/>
-  <% } %>
+      <label for="content">Innehåll</label>
+      <textarea id="content" name="content" required><%= page.content %></textarea>
 
-  <button type="submit">Spara</button>
-</form>
+      <label for="image">Bild (valfritt)</label>
+      <input type="file" id="image" name="image" accept="image/*">
+      <% if (page.imagePath) { %>
+        <div>Nuvarande bild:</div>
+        <img src="/<%= page.imagePath %>" alt="Page Image" class="current-image">
+      <% } %>
+
+      <button type="submit">Spara sidan</button>
+    </form>
+  </div>
+</body>
+</html>

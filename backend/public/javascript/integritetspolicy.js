@@ -90,10 +90,10 @@ faqQuestions.forEach(question => {
         answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
 
         // Scrolla smidigt till sektionen
-        if(targetSection){
-            const headerHeight = document.querySelector('header').offsetHeight;
-            const elementPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - headerHeight;
-            window.scrollTo({ top: elementPosition, behavior: 'smooth' });
-        }
+        // if(targetSection){
+        //     const headerHeight = document.querySelector('header').offsetHeight;
+        //     const elementPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+        //     window.scrollTo({ top: elementPosition, behavior: 'smooth' });
+        // }
     });
 });

@@ -1,131 +1,41 @@
-const db = require('../models');
-const User = db.User;
-const Contact = db.Contact;
-const Page = db.Page;
+// controllers/adminController.js
 
-module.exports = {
+// --- Alla funktioner här ---
+export const showLogin = (req, res) => {
+  // kod för att visa login
+};
 
-  // Visa login-sidan
-  showLogin: (req, res) => {
-    res.render('admin/login', {
-      title: 'Logga in',
-      session: req.session
-    });
-  },
+export const doLogin = (req, res) => {
+  // kod för att logga in
+};
 
-  // Hantera login
-  doLogin: async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ where: { email } });
+export const logout = (req, res) => {
+  // kod för logout
+};
 
-      if (!user) {
-        req.flash('error', 'Fel e-post eller lösenord');
-        return res.redirect('/admin/login');
-      }
+export const dashboard = (req, res) => {
+  // kod för dashboard
+};
 
-      const ok = await user.comparePassword(password);
-      if (!ok) {
-        req.flash('error', 'Fel e-post eller lösenord');
-        return res.redirect('/admin/login');
-      }
+export const listContacts = (req, res) => {
+  // kod för att lista kontakter
+};
 
-      req.session.user = { id: user.id, email: user.email, role: user.role };
-      req.flash('success', 'Inloggning lyckades!');
-      res.redirect('/admin');
-    } catch (err) {
-      console.error('Login error:', err);
-      req.flash('error', 'Något gick fel, försök igen.');
-      res.redirect('/admin/login');
-    }
-  },
+export const showEditPage = (req, res) => {
+  // kod för att visa/editera sida
+};
 
-  // Logout
-  logout: (req, res) => {
-    req.session.destroy(err => {
-      if (err) console.error('Logout error:', err);
-      res.redirect('/admin/login');
-    });
-  },
+export const savePage = (req, res) => {
+  // kod för att spara sida
+};
 
-  // Admin-dashboard
-  dashboard: async (req, res) => {
-    try {
-      const count = await Contact.count();
-      res.render('admin/dashboard', {
-        title: 'Dashboard',
-        count,
-        session: req.session
-      });
-    } catch (err) {
-      console.error('Dashboard error:', err);
-      req.flash('error', 'Kunde inte hämta dashboard-data.');
-      res.redirect('/admin/login');
-    }
-  },
-
-  // Lista kontakter
-  listContacts: async (req, res) => {
-    try {
-      const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
-      res.render('admin/contacts', {
-        title: 'Kontakter',
-        contacts,
-        session: req.session
-      });
-    } catch (err) {
-      console.error('Contacts error:', err);
-      req.flash('error', 'Kunde inte hämta kontaktlistan.');
-      res.redirect('/admin');
-    }
-  },
-
-  // Visa och skapa/redigera sida
-  showEditPage: async (req, res) => {
-    try {
-      const slug = req.params.slug || 'home';
-      let page = await Page.findOne({ where: { slug } });
-      if (!page) page = await Page.create({ slug, title: '', content: '' });
-
-      res.render('admin/edit_page', {
-        title: `Redigera: ${page.title || slug}`,
-        page,
-        session: req.session
-      });
-    } catch (err) {
-      console.error('Edit page error:', err);
-      req.flash('error', 'Kunde inte hämta sidan.');
-      res.redirect('/admin');
-    }
-  },
-
-  // Spara sida
-  savePage: async (req, res) => {
-    try {
-      const slug = req.params.slug || 'home';
-      let page = await Page.findOne({ where: { slug } });
-
-      if (!page) {
-        page = await Page.create({
-          slug,
-          title: req.body.title,
-          content: req.body.content,
-          image: req.file ? req.file.path : null
-        });
-      } else {
-        page.title = req.body.title;
-        page.content = req.body.content;
-        if (req.file) page.image = req.file.path;
-        page.updatedAt = new Date();
-        await page.save();
-      }
-
-      req.flash('success', 'Sidan sparades!');
-      res.redirect('/admin/pages/' + slug);
-    } catch (err) {
-      console.error('Save page error:', err);
-      req.flash('error', 'Kunde inte spara sidan.');
-      res.redirect('/admin');
-    }
-  }
+// --- Default-export ---
+export default {
+  showLogin,
+  doLogin,
+  logout,
+  dashboard,
+  listContacts,
+  showEditPage,
+  savePage
 };

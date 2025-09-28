@@ -111,13 +111,24 @@
 /* === Form-message styling === */
 .form-message {
     margin-top: 1rem;
-    padding: 1rem 1.25rem;
+    padding: 1rem 1.25rem 1rem 2.5rem; /* extra padding vänster för ikon */
     border-radius: 8px;
     font-weight: 600;
     font-size: 1rem;
     display: none; /* göms tills den visas */
     opacity: 0;
     transition: opacity 0.4s ease, transform 0.3s ease;
+    position: relative; /* behövs för ikonerna */
+}
+
+/* Ikon-baserad styling */
+.form-message.success::before,
+.form-message.error::before {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
 }
 
 /* Success */
@@ -128,12 +139,22 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+.form-message.success::before {
+    content: "✔";
+    color: #155724;
+}
+
 /* Error */
 .form-message.error {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.form-message.error::before {
+    content: "❌";
+    color: #721c24;
 }
 
 /* När meddelandet visas */
@@ -143,18 +164,78 @@
     transform: translateY(0);
 }
 
-/* Animation när meddelandet dyker upp */
+/* Success animation */
 .form-message.success.show {
-    animation: slideFadeIn 0.5s forwards;
+    animation: popIn 0.5s forwards;
 }
 
+/* Error animation */
 .form-message.error.show {
-    animation: slideFadeIn 0.5s forwards;
+    animation: shake 0.5s forwards;
 }
 
-@keyframes slideFadeIn {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 1; transform: translateY(0); }
+/* === Keyframes === */
+@keyframes popIn {
+    0% { opacity: 0; transform: scale(0.9); }
+    60% { opacity: 1; transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+
+
+/* ===== FAQ Sektion ===== */
+.faq-section {
+    background-color: #f9f9f9;
+    padding: 4rem 0;
+}
+
+.faq-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #1479df;
+}
+
+.faq-item {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #222;
+    transition: color 0.3s;
+}
+
+.faq-question:hover {
+    color: #1479df;
+}
+
+.faq-answer {
+    display: none;
+    padding: 0 1rem 1rem 1rem;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.faq-answer p {
+    margin: 0;
 }
 
 

@@ -1,20 +1,89 @@
-<h2>Admin login</h2>
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 { text-align: center; margin-bottom: 20px; }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 16px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #555; }
+    .flash-success {
+      background: #e6ffed;
+      color: #2b7a0b;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .flash-error {
+      background: #ffe6e6;
+      color: #900;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Admin Login</h2>
 
-<% if (error && error.length > 0) { %>
-  <div style="background:#ffe6e6;padding:10px;border-radius:4px;color:#900">
-    <%= error[0] %>
-  </div>
+    <% if (flash.success && flash.success.length > 0) { %>
+  <div class="flash-success"><%= flash.success[0] %></div>
 <% } %>
 
-<form method="post" action="/admin/login">
-  <!-- CSRF token -->
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+<% if (flash.error && flash.error.length > 0) { %>
+  <div class="flash-error"><%= flash.error[0] %></div>
+<% } %>
 
-  <label for="username">E-post</label><br/>
-  <input type="text" id="username" name="username" required/><br/><br/>
 
-  <label for="password">Lösenord</label><br/>
-  <input type="password" id="password" name="password" required/><br/><br/>
+    <form method="post" action="/admin/login">
+      <!-- CSRF token -->
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-  <button type="submit">Logga in</button>
-</form>
+      <label for="username">E-post</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="password">Lösenord</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Logga in</button>
+    </form>
+  </div>
+</body>
+</html>

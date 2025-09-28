@@ -3,88 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Kontakter</title>
+  <title><%= title %></title>
+  <meta name="csrf-token" content="<%= csrfToken %>">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
+    body { font-family: Arial, sans-serif; background: #f7f7f7; }
+    .container { max-width: 1000px; margin: 50px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid #ccc; text-align: left; }
+    th { background: #eee; }
+    button { padding: 5px 10px; background: #900; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #b00; }
+    nav { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    nav a { margin-left: 15px; text-decoration: none; color: #333; }
+    .flash-success { background: #e6ffed; color: #2b7a0b; padding: 10px; border-radius: 4px; margin-bottom: 10px; text-align: center; }
+    .flash-error { background: #ffe6e6; color: #900; padding: 10px; border-radius: 4px; margin-bottom: 10px; text-align: center; }
+
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
     }
-    h1 {
-      color: #333;
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+    .modal-content {
       background: #fff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-    th {
-      background: #333;
-      color: #fff;
-    }
-    tr:nth-child(even) {
-      background: #f9f9f9;
-    }
-    .no-contacts {
+      padding: 25px;
+      border-radius: 10px;
       text-align: center;
-      padding: 20px;
-      background: #ffe6e6;
-      color: #900;
-      border-radius: 4px;
-      margin-top: 20px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
+    .modal-buttons button {
+      margin: 10px;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #cancelBtn { background: #ccc; }
+    #confirmBtn { background: #d9534f; color: white; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <nav>
+      <span><%= session.user.email %> (<%= session.user.role %>)</span>
+      <a href="/admin/logout">Logga ut</a>
+      <a href="/admin">Dashboard</a>
+      <a href="/admin/pages">Sidor</a>
+    </nav>
 
-<h1>Kontakter</h1>
+    <% if (flash.success && flash.success.length > 0) { %>
+      <div class="flash-success"><%= flash.success[0] %></div>
+    <% } %>
+    <% if (flash.error && flash.error.length > 0) { %>
+      <div class="flash-error"><%= flash.error[0] %></div>
+    <% } %>
 
-<% if (contacts.length === 0) { %>
-  <div class="no-contacts">Inga kontakter hittades.</div>
-<% } else { %>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Namn</th>
-        <th>E-post</th>
-        <th>Företag</th>
-        <th>Bransch</th>
-        <th>Meddelande</th>
-        <th>Fil</th>
-        <th>Skapad</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% contacts.forEach(contact => { %>
+    <h1>Kontakter</h1>
+    <table>
+      <thead>
         <tr>
-          <td><%= contact.id %></td>
-          <td><%= contact.name %></td>
-          <td><%= contact.email %></td>
-          <td><%= contact.company || '-' %></td>
-          <td><%= contact.industry || '-' %></td>
-          <td><%= contact.message %></td>
-          <td>
-            <% if (contact.filePath) { %>
-              <a href="<%= contact.filePath %>" target="_blank">Visa fil</a>
-            <% } else { %>
-              -
-            <% } %>
-          </td>
-          <td><%= new Date(contact.createdAt).toLocaleString('sv-SE') %></td>
+          <th>ID</th>
+          <th>Namn</th>
+          <th>Email</th>
+          <th>Företag</th>
+          <th>Bransch</th>
+          <th>Meddelande</th>
+          <th>Skapad</th>
+          <th>Åtgärd</th>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
-<% } %>
+      </thead>
+      <tbody>
+        <% contacts.forEach(contact => { %>
+          <tr>
+            <td><%= contact.id %></td>
+            <td><%= contact.name %></td>
+            <td><%= contact.email %></td>
+            <td><%= contact.company || '-' %></td>
+            <td><%= contact.industry || '-' %></td>
+            <td><%= contact.message %></td>
+            <td><%= contact.createdAt.toLocaleString() %></td>
+            <td>
+              <button type="button" class="delete-btn" data-id="<%= contact.id %>" data-name="<%= contact.name %>">Radera</button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 
+  <!-- Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <p id="modalText">Är du säker på att du vill radera kontakten?</p>
+      <div class="modal-buttons">
+        <button id="cancelBtn">Avbryt</button>
+        <button id="confirmBtn">Radera</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('deleteModal');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const modalText = document.getElementById('modalText');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    let currentContactId = null;
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentContactId = btn.dataset.id;
+        const contactName = btn.dataset.name;
+        modalText.textContent = `Är du säker på att du vill radera kontakten "${contactName}"?`;
+        modal.style.display = 'flex';
+      });
+    });
+
+    confirmBtn.onclick = async () => {
+      if (!currentContactId) return;
+      try {
+        const res = await fetch(`/admin/contacts/delete/${currentContactId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'CSRF-Token': csrfToken
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          location.reload();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Fel vid radering.');
+      }
+    };
+
+    cancelBtn.onclick = () => {
+      modal.style.display = 'none';
+      currentContactId = null;
+    };
+
+    window.onclick = (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        currentContactId = null;
+      }
+    };
+  </script>
 </body>
 </html>

@@ -1,23 +1,19 @@
 // models/Page.js
-const { DataTypes, Model } = require('sequelize');
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../config/database.js';
 
-class Page extends Model {
-  static initModel(sequelize) {
-    Page.init({
-      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      slug: { type: DataTypes.STRING, unique: true }, // e.g. 'home', 'privacy'
-      title: { type: DataTypes.STRING },
-      content: { type: DataTypes.TEXT },
-      image: { type: DataTypes.STRING },
-      updatedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
-    }, {
-      sequelize,
-      modelName: 'Page',
-      tableName: 'pages',
-      timestamps: false
-    });
-    return Page;
-  }
-}
+class Page extends Model {}
 
-module.exports = Page;
+Page.init({
+  title: { type: DataTypes.STRING, allowNull: false },
+  slug: { type: DataTypes.STRING, allowNull: false, unique: true },
+  content: { type: DataTypes.TEXT, allowNull: true },
+  imagePath: { type: DataTypes.STRING, allowNull: true }
+}, {
+  sequelize,
+  modelName: 'Page',
+  tableName: 'pages',
+  timestamps: true
+});
+
+export default Page;
