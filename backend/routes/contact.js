@@ -1,14 +1,26 @@
 // routes/contact.js
 import express from 'express';
 import nodemailer from 'nodemailer';
+import rateLimit from 'express-rate-limit';
 import db from '../models/index.js';
 
 const { Contact } = db;
 
 const router = express.Router();
 
+// Rate limiter for contact form
+const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 3, // limit each IP to 3 requests per windowMs
+  handler: (req, res) => {
+    res.status(429).json({ success: false, error: 'För många kontaktförfrågningar från din IP-adress. Försök igen om 15 minuter.' });
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 // POST /contact – hantera formulär
-router.post('/', async (req, res) => {
+router.post('/', contactLimiter, async (req, res) => {
   try {
     const { name, email, company, industry, otherIndustry, message } = req.body;
 

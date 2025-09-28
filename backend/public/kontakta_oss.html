@@ -127,19 +127,19 @@
             <form id="contactForm" aria-label="Kontaktformulär för Waz Go">
               <div class="form-group">
                 <label for="name">Namn</label>
-                <input type="text" id="name" name="name" required aria-required="true">
+                <input type="text" id="name" name="name" required aria-required="true" autocomplete="name">
               </div>
               <div class="form-group">
                 <label for="email">E-post</label>
-                <input type="email" id="email" name="email" required aria-required="true">
+                <input type="email" id="email" name="email" required aria-required="true" autocomplete="email">
               </div>
               <div class="form-group">
                 <label for="company">Företag</label>
-                <input type="text" id="company" name="company">
+                <input type="text" id="company" name="company" autocomplete="organization">
               </div>
               <div class="form-group">
                 <label for="industry">Bransch</label>
-                <select id="industry" name="industry">
+                <select id="industry" name="industry" autocomplete="off">
                   <option value="">Välj bransch</option>
                   <option value="restaurant">Restaurang / Café</option>
                   <option value="retail">Handel</option>
@@ -149,11 +149,11 @@
               </div>
               <div class="form-group" id="other-industry-group" style="display:none;">
                 <label for="other-industry">Ange bransch</label>
-                <input type="text" id="other-industry" name="otherIndustry">
+                <input type="text" id="other-industry" name="otherIndustry" autocomplete="off">
               </div>
               <div class="form-group">
                 <label for="message">Meddelande</label>
-                <textarea id="message" name="message" required aria-required="true"></textarea>
+                <textarea id="message" name="message" required aria-required="true" autocomplete="off"></textarea>
               </div>
               <button type="submit" class="btn">Skicka meddelande</button>
             </form>
