@@ -113,7 +113,11 @@ export const changePassword = async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   const userId = req.session.user.id;
 
-  if (newPassword === currentPassword) {
+  const trimmedCurrentPassword = currentPassword.trim();
+  const trimmedNewPassword = newPassword.trim();
+  const trimmedConfirmPassword = confirmPassword.trim();
+
+  if (trimmedNewPassword === trimmedCurrentPassword) {
     req.flash('error', 'Nytt lösenord kan inte vara samma som det nuvarande');
     return res.redirect('/admin/change-password');
   }
@@ -131,18 +135,18 @@ export const changePassword = async (req, res) => {
       return res.redirect('/admin/change-password');
     }
 
-    if (!(await user.comparePassword(currentPassword))) {
+    if (!(await user.comparePassword(trimmedCurrentPassword))) {
       req.flash('error', 'Fel nuvarande lösenord');
       return res.redirect('/admin/change-password');
     }
 
-    if (newPassword !== confirmPassword) {
+    if (trimmedNewPassword !== trimmedConfirmPassword) {
       req.flash('error', 'Lösenorden matchar inte');
       return res.redirect('/admin/change-password');
     }
 
     // Update password (hooks will hash it)
-    user.password = newPassword;
+    user.password = trimmedNewPassword;
     await user.save();
 
     req.session.destroy((err) => {

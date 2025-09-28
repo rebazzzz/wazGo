@@ -71,62 +71,6 @@
     </div>
   </div>
 
-  <script>
-    const modal = document.getElementById('deleteModal');
-    const confirmBtn = document.getElementById('confirmBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const modalText = document.getElementById('modalText');
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    let currentContactId = null;
-
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentContactId = btn.dataset.id;
-        const contactName = btn.dataset.name;
-        modalText.textContent = `Är du säker på att du vill radera kontakten "${contactName}"?`;
-        modal.style.display = 'flex';
-      });
-    });
-
-    confirmBtn.onclick = async () => {
-      if (!currentContactId) return;
-      try {
-        const params = new URLSearchParams();
-        params.append('id', currentContactId);
-        params.append('_csrf', csrfToken);
-
-        const res = await fetch('/admin/contacts/delete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: params
-        });
-        const data = await res.json();
-        if (data.success) {
-          location.reload();
-        } else {
-          alert(data.message || 'Fel vid radering');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Fel vid radering.');
-      }
-    };
-
-    cancelBtn.onclick = () => {
-      modal.style.display = 'none';
-      currentContactId = null;
-    };
-
-    window.onclick = (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-        currentContactId = null;
-      }
-    };
-  </script>
+  <script src="/admin/static/admin.js"></script>
 </body>
 </html>

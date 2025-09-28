@@ -10,6 +10,7 @@ import session from 'express-session';
 import flash from 'connect-flash';
 import csrf from 'csurf';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import bcrypt from 'bcrypt';
 
 import db from './models/index.js';
@@ -22,6 +23,18 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
 
 // Middleware
 app.use(cors());
