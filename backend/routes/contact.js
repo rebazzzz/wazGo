@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
 
         // Mail till dig
         await transporter.sendMail({
-          from: `"Waz Go" <${process.env.SMTP_USER}>`,
+          from: process.env.EMAIL_FROM,
           to: process.env.SMTP_TO || process.env.SMTP_USER,
           subject: `Ny kontaktförfrågan från ${name}`,
           text: `Namn: ${name}\nEmail: ${email}\nFöretag: ${company}\nBransch: ${industry}\nMeddelande:\n${message}`
@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
 
         // Bekräftelsemail till användaren
         await transporter.sendMail({
-          from: `"Waz Go" <${process.env.SMTP_USER}>`,
+          from: process.env.EMAIL_FROM,
           to: email,
           subject: 'Tack för ditt meddelande till Waz Go',
           text: `Hej ${name},\n\nTack för att du kontaktade oss! Vi återkommer snart.\n\nHälsningar,\nWaz Go-teamet`
