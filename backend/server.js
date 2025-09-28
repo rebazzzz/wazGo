@@ -9,6 +9,8 @@ import { fileURLToPath } from 'url';
 import session from 'express-session';
 import flash from 'connect-flash';
 import csrf from 'csurf';
+import rateLimit from 'express-rate-limit';
+import bcrypt from 'bcrypt';
 
 import db from './models/index.js';
 import adminRoutes from './routes/admin.js';
@@ -31,7 +33,13 @@ app.use(cookieParser());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'hemlignyckel',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: false, // Set to true in production with HTTPS
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
 }));
 app.use(flash());
 
@@ -60,11 +68,37 @@ app.use('/admin', adminRoutes);
 
 // Frontend
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get("/demos", (req, res) => res.sendFile(path.join(__dirname, 'public', 'demos.html')));
 app.get("/kontakta_oss", (req, res) => res.sendFile(path.join(__dirname, 'public', 'kontakta_oss.html')));
 app.get("/integritetspolicy", (req, res) => res.sendFile(path.join(__dirname, 'public', 'integritetspolicy.html')));
+
+// Seed admin user if not exists
+const seedAdminUser = async () => {
+  const { User } = db;
+  const adminEmail = 'admin@wazgo.se';
+  const defaultPassword = 'changeme123'; // Change this immediately after first login
+
+  try {
+    const admin = await User.findOne({ where: { email: adminEmail } });
+    if (!admin) {
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+      await User.create({
+        email: adminEmail,
+        password: hashedPassword,
+        role: 'admin'
+      });
+      console.log('Admin user created with default password: changeme123. Please change it immediately.');
+    } else {
+      console.log('Admin user already exists.');
+    }
+  } catch (err) {
+    console.error('Error seeding admin user:', err);
+  }
+};
 
 // Start server
 app.listen(PORT, async () => {
   await db.syncDB();
+  await seedAdminUser();
   console.log(`Server körs på http://localhost:${PORT}`);
 });

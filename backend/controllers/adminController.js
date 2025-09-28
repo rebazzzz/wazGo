@@ -1,16 +1,18 @@
 // controllers/adminController.js
 import db from '../models/index.js';
 import bcrypt from 'bcrypt';
+import { validationResult } from 'express-validator';
 
 const { User, Contact, Page } = db;
 
 export const doLogin = async (req, res) => {
-  const { email, password } = req.body;
-  console.log('Login attempt:', { email, password, body: req.body });
-  if (!email || !password) {
-    req.flash('error', 'E-post och lösenord krävs');
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array()[0].msg);
     return res.redirect('/admin/login');
   }
+  const { email, password } = req.body;
+  console.log('Login attempt:', { email, password, body: req.body });
   try {
     const user = await User.findOne({ where: { email } });
     if (!user || !(await user.comparePassword(password))) {
@@ -27,6 +29,9 @@ export const doLogin = async (req, res) => {
 };
 
 export const showLogin = (req, res) => {
+  if (req.query.passwordChanged) {
+    req.flash('success', 'Lösenordet ändrat framgångsrikt. Logga in igen.');
+  }
   res.render('admin/login', { title: 'Admin Login', csrfToken: req.csrfToken() });
 };
 
@@ -98,6 +103,70 @@ export const uploadImage = (req, res) => {
   }
   req.flash('success', 'Bild uppladdad');
   res.redirect('/admin/dashboard');
+};
+
+export const showChangePassword = (req, res) => {
+  res.render('admin/change_password', { title: 'Ändra Lösenord', csrfToken: req.csrfToken() });
+};
+
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const userId = req.session.user.id;
+
+  if (newPassword === currentPassword) {
+    req.flash('error', 'Nytt lösenord kan inte vara samma som det nuvarande');
+    return res.redirect('/admin/change-password');
+  }
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array()[0].msg);
+    return res.redirect('/admin/change-password');
+  }
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      req.flash('error', 'Användare hittades inte');
+      return res.redirect('/admin/change-password');
+    }
+
+    if (!(await user.comparePassword(currentPassword))) {
+      req.flash('error', 'Fel nuvarande lösenord');
+      return res.redirect('/admin/change-password');
+    }
+
+    if (newPassword !== confirmPassword) {
+      req.flash('error', 'Lösenorden matchar inte');
+      return res.redirect('/admin/change-password');
+    }
+
+    // Update password (hooks will hash it)
+    user.password = newPassword;
+    await user.save();
+
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Session destroy error:', err);
+        return res.redirect('/admin/login');
+      }
+      res.redirect('/admin/login?passwordChanged=true');
+    });
+  } catch (err) {
+    console.error('Change password error:', err);
+    req.flash('error', 'Kunde inte ändra lösenordet');
+    res.redirect('/admin/change-password');
+  }
+};
+
+export const showPages = async (req, res) => {
+  try {
+    const pages = await Page.findAll({ order: [['title', 'ASC']] });
+    res.render('admin/pages', { title: 'Sidor', pages, csrfToken: req.csrfToken() });
+  } catch (err) {
+    console.error('Pages error:', err);
+    res.render('admin/pages', { title: 'Sidor', pages: [], csrfToken: req.csrfToken() });
+  }
 };
 
 export const logout = (req, res) => {

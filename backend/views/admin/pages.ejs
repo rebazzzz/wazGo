@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
+  <meta name="csrf-token" content="<%= csrfToken %>">
   <link rel="stylesheet" href="/admin/static/admin.css">
 </head>
 <body>
@@ -25,26 +26,29 @@
       <div class="flash-error"><%= flash.error[0] %></div>
     <% } %>
 
-    <h1>Redigera sida: <%= page.title || page.slug %></h1>
-
-    <form method="POST" action="/admin/pages/<%= page.slug %>" enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-      <label for="title">Titel</label>
-      <input type="text" id="title" name="title" value="<%= page.title %>" required>
-
-      <label for="content">Innehåll</label>
-      <textarea id="content" name="content" required><%= page.content %></textarea>
-
-      <label for="image">Bild (valfritt)</label>
-      <input type="file" id="image" name="image" accept="image/*">
-      <% if (page.imagePath) { %>
-        <div>Nuvarande bild:</div>
-        <img src="/<%= page.imagePath %>" alt="Page Image" class="current-image">
-      <% } %>
-
-      <button type="submit">Spara sidan</button>
-    </form>
+    <h1>Sidor</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titel</th>
+          <th>Slug</th>
+          <th>Åtgärd</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% pages.forEach(page => { %>
+          <tr>
+            <td><%= page.id %></td>
+            <td><%= page.title %></td>
+            <td><%= page.slug %></td>
+            <td>
+              <a href="/admin/edit/<%= page.id %>">Redigera</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
   </div>
 </body>
 </html>
