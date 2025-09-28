@@ -44,6 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
         contactForm.addEventListener('submit', async e => {
             e.preventDefault();
 
+            // Inaktivera submit-knappen för att förhindra multipla submissioner
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Skickar...';
+            }
+
             formMessage.classList.remove('success', 'error', 'show');
             if (hideTimeout) clearTimeout(hideTimeout);
 
@@ -91,6 +98,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 hideTimeout = setTimeout(() => {
                     formMessage.classList.remove('show');
                 }, 5000);
+            } finally {
+                // Återaktivera submit-knappen
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
             }
         });
     }

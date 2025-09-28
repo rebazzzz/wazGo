@@ -6,7 +6,9 @@ import multer from 'multer';
 import path from 'path';
 import adminCtrl from '../controllers/adminController.js';
 import { ensureAdmin } from '../middleware/auth.js';
-import Contact from '../models/Contact.js'; // Glöm inte att importera modellen
+import db from '../models/index.js';
+
+const { Contact } = db;
 
 const router = express.Router();
 

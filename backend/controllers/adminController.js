@@ -19,18 +19,28 @@ export const showLogin = (req, res) => {
 
 export const doLogin = async (req, res) => {
   const { username, password } = req.body;
+  console.log('Login attempt:', { username, hasPassword: !!password });
   try {
     const user = await User.findOne({ where: { email: username } });
-    if (!user || !(await user.comparePassword(password))) {
+    console.log('User found:', !!user);
+    if (!user) {
+      console.log('No user found for email:', username);
       req.flash('error', 'Fel användarnamn eller lösenord');
       return res.redirect('/admin/login');
     }
-    req.session.userId = user.id;
-    req.session.userRole = user.role;
+    const passwordMatch = await user.comparePassword(password);
+    console.log('Password match:', passwordMatch);
+    if (!passwordMatch) {
+      console.log('Password mismatch for user:', username);
+      req.flash('error', 'Fel användarnamn eller lösenord');
+      return res.redirect('/admin/login');
+    }
+    req.session.user = { id: user.id, email: user.email, role: user.role };
+    console.log('Login successful for:', username);
     req.flash('success', 'Inloggad!');
     res.redirect('/admin');
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     req.flash('error', 'Serverfel');
     res.redirect('/admin/login');
   }
@@ -49,7 +59,6 @@ export const dashboard = async (req, res) => {
       title: 'Dashboard',
       contactCount,
       pageCount,
-      csrfToken: req.csrfToken(),
       flash: {
         success: req.flash('success'),
         error: req.flash('error')
