@@ -6,6 +6,12 @@ import logger from '../utils/logger.js';
 
 const { User, Contact, Page } = db;
 
+/**
+ * Handles user login process including validation, account locking for failed attempts, and 2FA redirection.
+ * @param {Object} req - Express request object containing email and password in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to login, 2FA verification, or dashboard based on login outcome
+ */
 export const doLogin = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -64,6 +70,12 @@ export const doLogin = async (req, res) => {
   }
 };
 
+/**
+ * Renders the admin login page with flash messages and CSRF token.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/login.ejs
+ */
 export const showLogin = (req, res) => {
   if (req.query.passwordChanged) {
     req.flash('success', 'Lösenordet ändrat framgångsrikt. Logga in igen.');
@@ -77,6 +89,12 @@ export const showLogin = (req, res) => {
   res.render('admin/login', { title: 'Admin Login', csrfToken: req.csrfToken() });
 };
 
+/**
+ * Renders the admin dashboard with contact and page counts, and 2FA status.
+ * @param {Object} req - Express request object with session user
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/dashboard.ejs with counts and CSRF token
+ */
 export const showDashboard = async (req, res) => {
   try {
     const contactCount = await Contact.count();
@@ -89,6 +107,12 @@ export const showDashboard = async (req, res) => {
   }
 };
 
+/**
+ * Renders the contacts page with all contacts ordered by creation date.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/contacts.ejs with contacts list and CSRF token
+ */
 export const showContacts = async (req, res) => {
   try {
     const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
@@ -99,6 +123,12 @@ export const showContacts = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a contact by ID and returns JSON response.
+ * @param {Object} req - Express request object with contact ID in body
+ * @param {Object} res - Express response object
+ * @returns {void} JSON response indicating success or failure
+ */
 export const deleteContact = async (req, res) => {
   const { id } = req.body;
   try {
@@ -110,6 +140,12 @@ export const deleteContact = async (req, res) => {
   }
 };
 
+/**
+ * Renders the edit page form for a specific page by ID.
+ * @param {Object} req - Express request object with page ID in params
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/edit_page.ejs or redirects if page not found
+ */
 export const showEditPage = async (req, res) => {
   const { id } = req.params;
   try {
@@ -126,6 +162,12 @@ export const showEditPage = async (req, res) => {
   }
 };
 
+/**
+ * Updates a page's title and content by ID.
+ * @param {Object} req - Express request object with page ID in params and title/content in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to dashboard with flash message
+ */
 export const updatePage = async (req, res) => {
   const { id } = req.params;
   const { title, content } = req.body;
@@ -139,6 +181,12 @@ export const updatePage = async (req, res) => {
   res.redirect('/admin/dashboard');
 };
 
+/**
+ * Handles image upload and redirects with flash message.
+ * @param {Object} req - Express request object with uploaded file
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to dashboard with success or error flash
+ */
 export const uploadImage = (req, res) => {
   if (!req.file) {
     req.flash('error', 'Ingen fil vald');
@@ -148,10 +196,22 @@ export const uploadImage = (req, res) => {
   res.redirect('/admin/dashboard');
 };
 
+/**
+ * Renders the change password page with CSRF token.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/change_password.ejs
+ */
 export const showChangePassword = (req, res) => {
   res.render('admin/change_password', { title: 'Ändra Lösenord', csrfToken: req.csrfToken() });
 };
 
+/**
+ * Changes the user's password after validation and destroys session.
+ * @param {Object} req - Express request object with current and new passwords in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to login with flash message or back to change password on error
+ */
 export const changePassword = async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   const userId = req.session.user.id;
@@ -206,6 +266,12 @@ export const changePassword = async (req, res) => {
   }
 };
 
+/**
+ * Renders the pages list page with all pages ordered by title.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/pages.ejs with pages list and CSRF token
+ */
 export const showPages = async (req, res) => {
   try {
     const pages = await Page.findAll({ order: [['title', 'ASC']] });
@@ -216,15 +282,33 @@ export const showPages = async (req, res) => {
   }
 };
 
+/**
+ * Destroys the user session and redirects to login.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to /admin/login
+ */
 export const logout = (req, res) => {
   req.session.destroy();
   res.redirect('/admin/login');
 };
 
+/**
+ * Renders the 2FA setup page with CSRF token.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/setup_2fa.ejs
+ */
 export const showSetup2FA = (req, res) => {
   res.render('admin/setup_2fa', { title: 'Setup 2FA', csrfToken: req.csrfToken() });
 };
 
+/**
+ * Generates a 2FA secret and QR code for setup.
+ * @param {Object} req - Express request object with session user
+ * @param {Object} res - Express response object
+ * @returns {void} Renders setup_2fa.ejs with QR code and secret
+ */
 export const setup2FA = async (req, res) => {
   const speakeasy = await import('speakeasy');
   const qrcode = await import('qrcode');
@@ -251,6 +335,12 @@ export const setup2FA = async (req, res) => {
   });
 };
 
+/**
+ * Enables 2FA after verifying the provided code and destroys session.
+ * @param {Object} req - Express request object with 2FA code in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to login with success or back to setup on error
+ */
 export const enable2FA = async (req, res) => {
   const { code } = req.body;
   const speakeasy = await import('speakeasy');
@@ -292,6 +382,12 @@ export const enable2FA = async (req, res) => {
   }
 };
 
+/**
+ * Disables 2FA after verifying the provided code and destroys session.
+ * @param {Object} req - Express request object with 2FA code in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to login with success or back to dashboard on error
+ */
 export const disable2FA = async (req, res) => {
   const { code } = req.body;
   const speakeasy = await import('speakeasy');
@@ -334,6 +430,12 @@ export const disable2FA = async (req, res) => {
   }
 };
 
+/**
+ * Renders the 2FA verification page if pending 2FA in session.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/verify_2fa.ejs or redirects to login
+ */
 export const showVerify2FA = (req, res) => {
   if (!req.session.pending2FA) {
     return res.redirect('/admin/login');
@@ -341,6 +443,12 @@ export const showVerify2FA = (req, res) => {
   res.render('admin/verify_2fa', { title: 'Verify 2FA', csrfToken: req.csrfToken() });
 };
 
+/**
+ * Verifies the 2FA code and logs in the user if valid.
+ * @param {Object} req - Express request object with 2FA code in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to dashboard on success or back to verify on error
+ */
 export const verify2FA = async (req, res) => {
   const { code } = req.body;
   const speakeasy = await import('speakeasy');

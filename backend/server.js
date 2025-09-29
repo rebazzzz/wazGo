@@ -1,4 +1,3 @@
-
 // server.js
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -13,18 +12,35 @@ import csrf from 'csurf';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import bcrypt from 'bcrypt';
+import * as Sentry from '@sentry/node';
+import { httpIntegration, consoleIntegration } from '@sentry/node';
 
 import db from './models/index.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
 import logger from './utils/logger.js';
+import { swaggerUi, specs } from './swagger.js';
 
 dotenv.config();
+
+// Initialize Sentry
+Sentry.init({
+  dsn: process.env.SENTRY_DSN || 'https://eddcbdf550c1f2624aa1f6fc3292f463@o4510102162309120.ingest.de.sentry.io/4510102176333904', // Replace with actual DSN
+  environment: process.env.NODE_ENV || 'development',
+  integrations: [
+    httpIntegration({ tracing: true }),
+    consoleIntegration(),
+  ],
+  tracesSampleRate: 1.0,
+});
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+
 
 // Security headers
 app.use(helmet({
@@ -83,6 +99,9 @@ app.use('/admin/static', express.static(path.join(__dirname, 'public', 'admin'))
 app.use('/contact', contactRoutes);
 app.use('/admin', adminRoutes);
 
+// API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 // Frontend
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get("/demos", (req, res) => res.sendFile(path.join(__dirname, 'public', 'demos.html')));
@@ -96,6 +115,7 @@ app.use((err, req, res, next) => {
     return res.status(403).json({ success: false, error: 'Invalid CSRF token' });
   }
   logger.error('Global error', { error: err.stack, ip: req.ip, url: req.url });
+  Sentry.captureException(err);
   if (req.accepts('json')) {
     res.status(500).json({ success: false, error: 'Internal server error' });
   } else {

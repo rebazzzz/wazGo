@@ -1,7 +1,13 @@
 // config/database.js
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
-dotenv.config();
+
+// Load test env if in test mode
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: '.env.test' });
+} else {
+  dotenv.config();
+}
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
