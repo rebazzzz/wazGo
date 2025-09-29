@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import csrf from 'csurf';
 import db from '../models/index.js';
+import logger from '../utils/logger.js';
 
 const { Contact } = db;
 
@@ -66,6 +67,15 @@ router.post('/', csrfProtection, contactLimiter, contactValidation, async (req, 
 
   try {
     const { name, email, company, industry, otherIndustry, message } = req.body;
+
+    logger.info('Contact form submission', {
+      name,
+      email,
+      company,
+      industry: industry === 'other' ? otherIndustry : industry,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    });
 
     // Spara i databasen
     const savedContact = await Contact.create({

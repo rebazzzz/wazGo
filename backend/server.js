@@ -1,3 +1,4 @@
+
 // server.js
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -16,6 +17,7 @@ import bcrypt from 'bcrypt';
 import db from './models/index.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
+import logger from './utils/logger.js';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -90,9 +92,10 @@ app.get("/integritetspolicy", (req, res) => res.sendFile(path.join(__dirname, 'p
 // Global error handler
 app.use((err, req, res, next) => {
   if (err.code === 'EBADCSRFTOKEN') {
+    logger.warn('CSRF token validation failed', { ip: req.ip, userAgent: req.get('User-Agent') });
     return res.status(403).json({ success: false, error: 'Invalid CSRF token' });
   }
-  console.error('Global error:', err.stack);
+  logger.error('Global error', { error: err.stack, ip: req.ip, url: req.url });
   if (req.accepts('json')) {
     res.status(500).json({ success: false, error: 'Internal server error' });
   } else {

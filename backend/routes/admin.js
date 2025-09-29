@@ -8,6 +8,7 @@ import rateLimit from 'express-rate-limit';
 import { body } from 'express-validator';
 import auth from '../middleware/auth.js';
 import * as adminController from '../controllers/adminController.js';
+import logger from '../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +25,31 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage });
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|gif/;
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedTypes.test(file.mimetype);
+
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    logger.warn('Suspicious upload attempt', {
+      filename: file.originalname,
+      mimetype: file.mimetype,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      userId: req.session.user?.id
+    });
+    return cb(new Error('Only image files are allowed!'), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter
+});
 
 // Rate limiter for login
 const loginLimiter = rateLimit({

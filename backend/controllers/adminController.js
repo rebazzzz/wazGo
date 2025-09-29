@@ -2,6 +2,7 @@
 import db from '../models/index.js';
 import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
+import logger from '../utils/logger.js';
 
 const { User, Contact, Page } = db;
 
@@ -16,6 +17,7 @@ export const doLogin = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) {
+      logger.warn('Failed login attempt: user not found', { email, ip: req.ip, userAgent: req.get('User-Agent') });
       req.flash('error', 'Felaktiga inloggningsuppgifter');
       return res.redirect('/admin/login');
     }
@@ -28,6 +30,7 @@ export const doLogin = async (req, res) => {
     }
 
     if (!(await user.comparePassword(password))) {
+      logger.warn('Failed login attempt: wrong password', { email, ip: req.ip, userAgent: req.get('User-Agent') });
       // Increment failed attempts
       user.failedAttempts += 1;
       if (user.failedAttempts >= 5) {
