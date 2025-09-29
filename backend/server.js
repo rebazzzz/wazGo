@@ -87,6 +87,16 @@ app.get("/demos", (req, res) => res.sendFile(path.join(__dirname, 'public', 'dem
 app.get("/kontakta_oss", (req, res) => res.sendFile(path.join(__dirname, 'public', 'kontakta_oss.html')));
 app.get("/integritetspolicy", (req, res) => res.sendFile(path.join(__dirname, 'public', 'integritetspolicy.html')));
 
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Global error:', err.stack);
+  if (req.accepts('json')) {
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  } else {
+    res.status(500).send('Internal server error');
+  }
+});
+
 // Seed admin user if not exists
 const seedAdminUser = async () => {
   const { User } = db;
