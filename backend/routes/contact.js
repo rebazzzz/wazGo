@@ -3,11 +3,19 @@ import express from 'express';
 import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
+import csrf from 'csurf';
 import db from '../models/index.js';
 
 const { Contact } = db;
 
 const router = express.Router();
+
+const csrfProtection = csrf({ cookie: true });
+
+// GET CSRF token
+router.get('/csrf', csrfProtection, (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
 
 // Rate limiter for contact form
 const contactLimiter = rateLimit({
@@ -50,8 +58,7 @@ const contactValidation = [
     .escape()
 ];
 
-// POST /contact – hantera formulär
-router.post('/', contactLimiter, contactValidation, async (req, res) => {
+router.post('/', csrfProtection, contactLimiter, contactValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, error: errors.array()[0].msg });

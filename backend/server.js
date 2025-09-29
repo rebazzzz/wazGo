@@ -89,6 +89,9 @@ app.get("/integritetspolicy", (req, res) => res.sendFile(path.join(__dirname, 'p
 
 // Global error handler
 app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    return res.status(403).json({ success: false, error: 'Invalid CSRF token' });
+  }
   console.error('Global error:', err.stack);
   if (req.accepts('json')) {
     res.status(500).json({ success: false, error: 'Internal server error' });

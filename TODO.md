@@ -1,0 +1,3 @@
+- [x] Add hidden CSRF token input to kontakta_oss.html form
+- [x] Update kontakta_oss.js to set the hidden input value with fetched token
+- [x] Verify CSRF protection is working (tested: invalid token blocked, valid token succeeds)
