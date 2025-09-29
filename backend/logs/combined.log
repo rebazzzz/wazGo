@@ -14,3 +14,9 @@
 2025-09-29T13:06:03.527Z [info]: Contact form submission
 2025-09-29T13:09:56.473Z [warn]: CSRF token validation failed
 2025-09-29T13:12:38.708Z [warn]: CSRF token validation failed
+2025-09-29T14:12:02.001Z [warn]: CSRF token validation failed
+2025-09-29T14:12:17.142Z [warn]: Failed login attempt: wrong password
+2025-09-29T14:12:34.715Z [warn]: Failed login attempt: wrong password
+2025-09-29T14:12:54.077Z [warn]: Failed login attempt: wrong password
+2025-09-29T14:15:21.142Z [warn]: Failed login attempt: wrong password
+2025-09-29T14:15:36.977Z [warn]: Failed login attempt: wrong password

@@ -14,8 +14,6 @@ async function syncDB(options = {}) {
   try {
     await sequelize.authenticate();
     console.log('✅ Databasen är ansluten.');
-    await sequelize.drop();
-    console.log('✅ Dropped all tables.');
     await sequelize.sync({ alter: true, ...options });
     console.log('✅ Modellerna syncade.');
 
