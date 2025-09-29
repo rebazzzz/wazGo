@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+</head>
+<body>
+  <nav>
+    <span>Waz Go Admin</span>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/contacts">Kontakter</a>
+    <a href="/admin/pages">Sidor</a>
+    <a href="/admin/change-password">Ändra Lösenord</a>
+    <a href="/admin/logout" class="logout">Logga ut</a>
+  </nav>
+
+  <div class="container">
+    <h1><%= title %></h1>
+
+    <% if (flash.success && flash.success.length > 0) { %>
+      <div class="flash-success"><%= flash.success[0] %></div>
+    <% } %>
+
+    <% if (flash.error && flash.error.length > 0) { %>
+      <div class="flash-error"><%= flash.error[0] %></div>
+    <% } %>
+
+    <% if (typeof qrCodeUrl !== 'undefined') { %>
+      <h2>Skanna QR-koden med din autentiseringsapp</h2>
+      <img src="<%= qrCodeUrl %>" alt="QR Code" style="max-width: 200px; margin: 1rem 0;">
+      <p>Alternativt, ange denna hemliga nyckel manuellt: <strong><%= secret %></strong></p>
+
+      <form action="/admin/enable-2fa" method="POST" id="enable2faForm">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label for="code">Ange 6-siffrig kod från appen:</label>
+        <input type="text" id="code" name="code" required maxlength="6" pattern="\d{6}" title="Ange 6 siffror">
+        <button type="submit">Aktivera 2FA</button>
+      </form>
+    <% } else { %>
+      <form action="/admin/setup-2fa" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <p>Klicka på knappen för att generera QR-kod för 2FA setup.</p>
+        <button type="submit">Generera QR-kod</button>
+      </form>
+    <% } %>
+  </div>
+
+  <!-- Enable 2FA Confirmation Modal -->
+  <div id="enable2faModal" class="modal">
+    <div class="modal-content">
+      <h3>Bekräfta 2FA Aktivering</h3>
+      <p>Du kommer att loggas ut efter aktivering. Logga in igen för att använda 2FA.</p>
+      <div class="modal-buttons">
+        <button id="confirmEnable2fa" class="btn btn-primary">Aktivera</button>
+        <button id="cancelEnable2fa" class="btn">Avbryt</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const enable2faForm = document.getElementById('enable2faForm');
+    const enable2faModal = document.getElementById('enable2faModal');
+    const confirmEnable2fa = document.getElementById('confirmEnable2fa');
+    const cancelEnable2fa = document.getElementById('cancelEnable2fa');
+
+    if (enable2faForm) {
+      enable2faForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        enable2faModal.style.display = 'flex';
+      });
+
+      confirmEnable2fa.onclick = () => {
+        enable2faForm.submit();
+      };
+
+      cancelEnable2fa.onclick = () => {
+        enable2faModal.style.display = 'none';
+      };
+
+      window.onclick = (e) => {
+        if (e.target === enable2faModal) {
+          enable2faModal.style.display = 'none';
+        }
+      };
+    }
+  </script>
+</body>
+</html>

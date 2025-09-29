@@ -40,6 +40,12 @@ router.post('/login', loginLimiter, csrfProtection, [
   body('password').isLength({ min: 6 }).withMessage('Lösenord måste vara minst 6 tecken')
 ], adminController.doLogin);
 
+// 2FA Verify (before auth, since user not logged in yet)
+router.get('/verify-2fa', csrfProtection, adminController.showVerify2FA);
+router.post('/verify-2fa', csrfProtection, [
+  body('code').isLength({ min: 6, max: 6 }).withMessage('2FA code must be 6 digits')
+], adminController.verify2FA);
+
 // Protected routes
 router.use(auth);
 
@@ -75,5 +81,15 @@ router.post('/upload', upload.single('image'), adminController.uploadImage);
 
 // Logout
 router.get('/logout', adminController.logout);
+
+// 2FA Setup
+router.get('/setup-2fa', csrfProtection, adminController.showSetup2FA);
+router.post('/setup-2fa', csrfProtection, adminController.setup2FA);
+router.post('/enable-2fa', csrfProtection, [
+  body('code').isLength({ min: 6, max: 6 }).withMessage('2FA code must be 6 digits')
+], adminController.enable2FA);
+router.post('/disable-2fa', csrfProtection, [
+  body('code').isLength({ min: 6, max: 6 }).withMessage('2FA code must be 6 digits')
+], adminController.disable2FA);
 
 export default router;

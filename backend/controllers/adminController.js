@@ -15,12 +15,45 @@ export const doLogin = async (req, res) => {
   console.log('Login attempt:', { email, password, body: req.body });
   try {
     const user = await User.findOne({ where: { email } });
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
       req.flash('error', 'Felaktiga inloggningsuppgifter');
       return res.redirect('/admin/login');
     }
-    req.session.user = { id: user.id, email: user.email, role: user.role };
-    res.redirect('/admin/dashboard');
+
+    // Check if account is locked
+    if (user.lockUntil && user.lockUntil > new Date()) {
+      const remainingTime = Math.ceil((user.lockUntil - new Date()) / 1000 / 60);
+      req.flash('error', `Konto låst på grund av för många misslyckade försök. Försök igen om ${remainingTime} minuter.`);
+      return res.redirect('/admin/login');
+    }
+
+    if (!(await user.comparePassword(password))) {
+      // Increment failed attempts
+      user.failedAttempts += 1;
+      if (user.failedAttempts >= 5) {
+        // Lock account for 15 minutes
+        user.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+        user.failedAttempts = 0; // Reset after lock
+        req.flash('error', 'För många misslyckade försök. Konto låst i 15 minuter.');
+      } else {
+        req.flash('error', 'Felaktiga inloggningsuppgifter');
+      }
+      await user.save();
+      return res.redirect('/admin/login');
+    }
+
+    // Successful login: reset failed attempts and unlock
+    user.failedAttempts = 0;
+    user.lockUntil = null;
+    await user.save();
+
+    if (user.twoFactorEnabled) {
+      req.session.pending2FA = user.id;
+      res.redirect('/admin/verify-2fa');
+    } else {
+      req.session.user = { id: user.id, email: user.email, role: user.role };
+      res.redirect('/admin/dashboard');
+    }
   } catch (err) {
     console.error('Login error:', err);
     req.flash('error', 'Inloggning misslyckades');
@@ -32,6 +65,12 @@ export const showLogin = (req, res) => {
   if (req.query.passwordChanged) {
     req.flash('success', 'Lösenordet ändrat framgångsrikt. Logga in igen.');
   }
+  if (req.query.twofaEnabled) {
+    req.flash('success', '2FA aktiverat framgångsrikt. Logga in igen.');
+  }
+  if (req.query.twofaDisabled) {
+    req.flash('success', '2FA inaktiverat framgångsrikt. Logga in igen.');
+  }
   res.render('admin/login', { title: 'Admin Login', csrfToken: req.csrfToken() });
 };
 
@@ -39,10 +78,11 @@ export const showDashboard = async (req, res) => {
   try {
     const contactCount = await Contact.count();
     const pageCount = await Page.count();
-    res.render('admin/dashboard', { title: 'Dashboard', contactCount, pageCount, csrfToken: req.csrfToken() });
+    const user = await User.findByPk(req.session.user.id);
+    res.render('admin/dashboard', { title: 'Dashboard', contactCount, pageCount, twoFactorEnabled: user.twoFactorEnabled, csrfToken: req.csrfToken() });
   } catch (err) {
     console.error('Dashboard error:', err);
-    res.render('admin/dashboard', { title: 'Dashboard', contactCount: 0, pageCount: 0, csrfToken: req.csrfToken() });
+    res.render('admin/dashboard', { title: 'Dashboard', contactCount: 0, pageCount: 0, twoFactorEnabled: false, csrfToken: req.csrfToken() });
   }
 };
 
@@ -176,4 +216,162 @@ export const showPages = async (req, res) => {
 export const logout = (req, res) => {
   req.session.destroy();
   res.redirect('/admin/login');
+};
+
+export const showSetup2FA = (req, res) => {
+  res.render('admin/setup_2fa', { title: 'Setup 2FA', csrfToken: req.csrfToken() });
+};
+
+export const setup2FA = async (req, res) => {
+  const speakeasy = await import('speakeasy');
+  const qrcode = await import('qrcode');
+
+  const userId = req.session.user.id;
+  const user = await User.findByPk(userId);
+
+  const secret = speakeasy.generateSecret({ name: 'Waz Go Admin', issuer: 'Waz Go' });
+  user.twoFactorSecret = secret.base32;
+  await user.save();
+
+  const otpauthUrl = speakeasy.otpauthURL({
+    secret: user.twoFactorSecret,
+    label: 'Waz Go Admin',
+    issuer: 'Waz Go'
+  });
+
+  qrcode.toDataURL(otpauthUrl, (err, qrCodeUrl) => {
+    if (err) {
+      req.flash('error', 'Failed to generate QR code');
+      return res.redirect('/admin/dashboard');
+    }
+    res.render('admin/setup_2fa', { title: 'Setup 2FA', qrCodeUrl, secret: user.twoFactorSecret, csrfToken: req.csrfToken() });
+  });
+};
+
+export const enable2FA = async (req, res) => {
+  const { code } = req.body;
+  const speakeasy = await import('speakeasy');
+
+  const userId = req.session.user.id;
+  const user = await User.findByPk(userId);
+
+  console.log('Enable 2FA - Secret:', user.twoFactorSecret);
+  console.log('Enable 2FA - User code:', code.trim());
+
+  const expectedToken = speakeasy.totp({
+    secret: user.twoFactorSecret,
+    encoding: 'base32'
+  });
+  console.log('Enable 2FA - Expected token:', expectedToken);
+
+  const verified = speakeasy.totp.verify({
+    secret: user.twoFactorSecret,
+    encoding: 'base32',
+    token: code.trim(),
+    window: 20
+  });
+
+  console.log('Enable 2FA - Verified:', verified);
+
+  if (verified) {
+    user.twoFactorEnabled = true;
+    await user.save();
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Session destroy error:', err);
+        return res.redirect('/admin/login');
+      }
+      res.redirect('/admin/login?2faEnabled=true');
+    });
+  } else {
+    req.flash('error', 'Invalid 2FA code');
+    res.redirect('/admin/setup-2fa');
+  }
+};
+
+export const disable2FA = async (req, res) => {
+  const { code } = req.body;
+  const speakeasy = await import('speakeasy');
+
+  const userId = req.session.user.id;
+  const user = await User.findByPk(userId);
+
+  console.log('Disable 2FA - Secret:', user.twoFactorSecret);
+  console.log('Disable 2FA - User code:', code.trim());
+
+  const expectedToken = speakeasy.totp({
+    secret: user.twoFactorSecret,
+    encoding: 'base32'
+  });
+  console.log('Disable 2FA - Expected token:', expectedToken);
+
+  const verified = speakeasy.totp.verify({
+    secret: user.twoFactorSecret,
+    encoding: 'base32',
+    token: code.trim(),
+    window: 20
+  });
+
+  console.log('Disable 2FA - Verified:', verified);
+
+  if (verified) {
+    user.twoFactorEnabled = false;
+    user.twoFactorSecret = null; // Optionally clear the secret
+    await user.save();
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Session destroy error:', err);
+        return res.redirect('/admin/login');
+      }
+      res.redirect('/admin/login?2faDisabled=true');
+    });
+  } else {
+    req.flash('error', 'Invalid 2FA code');
+    res.redirect('/admin/dashboard');
+  }
+};
+
+export const showVerify2FA = (req, res) => {
+  if (!req.session.pending2FA) {
+    return res.redirect('/admin/login');
+  }
+  res.render('admin/verify_2fa', { title: 'Verify 2FA', csrfToken: req.csrfToken() });
+};
+
+export const verify2FA = async (req, res) => {
+  const { code } = req.body;
+  const speakeasy = await import('speakeasy');
+
+  if (!req.session.pending2FA) {
+    return res.redirect('/admin/login');
+  }
+
+  const user = await User.findByPk(req.session.pending2FA);
+
+  console.log('Verify 2FA - Secret:', user.twoFactorSecret);
+  console.log('Verify 2FA - User code:', code.trim());
+
+  const expectedToken = speakeasy.totp({
+    secret: user.twoFactorSecret,
+    encoding: 'base32'
+  });
+  console.log('Verify 2FA - Expected token:', expectedToken);
+
+  const verified = speakeasy.totp.verify({
+    secret: user.twoFactorSecret,
+    encoding: 'base32',
+    token: code.trim(),
+    window: 20
+  });
+
+  console.log('Verify 2FA - Verified:', verified);
+
+  if (verified) {
+    req.session.user = { id: user.id, email: user.email, role: user.role };
+    delete req.session.pending2FA;
+    res.redirect('/admin/dashboard');
+  } else {
+    req.flash('error', 'Invalid 2FA code');
+    res.redirect('/admin/verify-2fa');
+  }
 };

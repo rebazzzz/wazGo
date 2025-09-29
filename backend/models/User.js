@@ -13,7 +13,11 @@ export default (sequelize) => {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
-    role: { type: DataTypes.STRING, defaultValue: 'admin' }
+    role: { type: DataTypes.STRING, defaultValue: 'admin' },
+    failedAttempts: { type: DataTypes.INTEGER, defaultValue: 0 },
+    lockUntil: { type: DataTypes.DATE, allowNull: true },
+    twoFactorSecret: { type: DataTypes.STRING, allowNull: true },
+    twoFactorEnabled: { type: DataTypes.BOOLEAN, defaultValue: false }
   }, {
     sequelize,
     modelName: 'User',

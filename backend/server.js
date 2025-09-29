@@ -53,7 +53,7 @@ app.use(session({
     httpOnly: true,
     secure: false, // Set to true in production with HTTPS
     sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 30 * 60 * 1000 // 30 minutes
   }
 }));
 app.use(flash());
@@ -104,7 +104,7 @@ app.use((err, req, res, next) => {
 const seedAdminUser = async () => {
   const { User } = db;
   const adminEmail = 'admin@wazgo.se';
-  const defaultPassword = 'changeme123'; // Change this immediately after first login
+  const defaultPassword = 'TempSecurePass123!'; // Strong default password, change immediately after first login
 
   try {
     const admin = await User.findOne({ where: { email: adminEmail } });
@@ -115,7 +115,7 @@ const seedAdminUser = async () => {
         password: hashedPassword,
         role: 'admin'
       });
-      console.log('Admin user created with default password: changeme123. Please change it immediately.');
+      console.log('Admin user created with default password: TempSecurePass123!. Please change it immediately.');
     } else {
       console.log('Admin user already exists.');
     }

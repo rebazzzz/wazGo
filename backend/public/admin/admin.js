@@ -96,4 +96,62 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     };
   }
+
+  // Idle logout timer
+  let idleTime = 0;
+  const idleInterval = setInterval(timerIncrement, 60000); // 1 minute
+
+  function timerIncrement() {
+    idleTime++;
+    if (idleTime > 25) { // 25 minutes
+      showIdleWarning();
+    }
+    if (idleTime > 30) { // 30 minutes
+      window.location.href = '/admin/logout';
+    }
+  }
+
+  function resetIdle() {
+    idleTime = 0;
+  }
+
+  // Reset idle time on activity
+  document.addEventListener('mousemove', resetIdle);
+  document.addEventListener('keypress', resetIdle);
+  document.addEventListener('click', resetIdle);
+  document.addEventListener('scroll', resetIdle);
+
+  function showIdleWarning() {
+    // Create modal for idle warning
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div class="modal-content" style="text-align: center; padding: 25px;">
+        <h3>Inaktivitet Varning</h3>
+        <p>Du kommer att loggas ut om 5 minuter på grund av inaktivitet.</p>
+        <div class="modal-buttons" style="margin-top: 20px;">
+          <button id="extendSession" class="btn btn-primary" style="margin-right: 10px;">Förläng Session</button>
+          <button id="logoutNow" class="btn">Logga ut nu</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('extendSession').onclick = () => {
+      modal.remove();
+      resetIdle();
+    };
+
+    document.getElementById('logoutNow').onclick = () => {
+      window.location.href = '/admin/logout';
+    };
+
+    window.onclick = (e) => {
+      if (e.target === modal) {
+        modal.remove();
+        resetIdle();
+      }
+    };
+  }
 });

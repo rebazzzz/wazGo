@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+</head>
+<body>
+  <div class="container">
+    <h1><%= title %></h1>
+
+    <% if (flash.error && flash.error.length > 0) { %>
+      <div class="flash-error"><%= flash.error[0] %></div>
+    <% } %>
+
+    <form action="/admin/verify-2fa" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label for="code">Ange 6-siffrig kod från din autentiseringsapp:</label>
+      <input type="text" id="code" name="code" required maxlength="6" pattern="\d{6}" title="Ange 6 siffror">
+      <button type="submit">Verifiera</button>
+    </form>
+  </div>
+</body>
+</html>

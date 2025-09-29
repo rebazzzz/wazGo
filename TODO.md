@@ -1,3 +1,12 @@
 - [x] Add hidden CSRF token input to kontakta_oss.html form
 - [x] Update kontakta_oss.js to set the hidden input value with fetched token
 - [x] Verify CSRF protection is working (tested: invalid token blocked, valid token succeeds)
+- [x] Implement account lockout: Added failedAttempts and lockUntil to User model, progressive lockout after 5 failed attempts
+- [x] Enforce password strength: Strong password validation already in place for changePassword, updated seeding to use strong default
+- [x] Implement 2FA: Added twoFactorSecret and twoFactorEnabled to User, setup/verify routes, QR code generation, TOTP verification
+- [x] Add disable 2FA feature: Route, controller, UI on dashboard
+- [x] Logout on 2FA enable/disable: Session destroyed after enable/disable, redirect to login with success message
+- [x] Idle logout: Session maxAge set to 30 minutes
+- [x] Style new 2FA pages (setup_2fa.ejs, verify_2fa.ejs) to match dashboard design
+- [x] Fix 2FA login flow: Move verify-2fa routes before auth middleware
+- [ ] Test login failures, password changes, and 2FA setup/verification

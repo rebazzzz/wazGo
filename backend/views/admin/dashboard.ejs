@@ -13,6 +13,9 @@
     <a href="/admin/contacts">Kontakter</a>
     <a href="/admin/pages">Sidor</a>
     <a href="/admin/change-password">Ändra Lösenord</a>
+    <% if (!twoFactorEnabled) { %>
+      <a href="/admin/setup-2fa">Aktivera 2FA</a>
+    <% } %>
     <a href="/admin/logout" class="logout">Logga ut</a>
   </nav>
 
@@ -37,6 +40,59 @@
         <p><%= pageCount %></p>
       </div>
     </div>
+
+    <% if (twoFactorEnabled) { %>
+      <div class="section">
+        <h2>Inaktivera 2FA</h2>
+        <p>Ange din nuvarande 2FA-kod för att inaktivera tvåfaktorsautentisering.</p>
+        <form action="/admin/disable-2fa" method="POST" id="disable2faForm">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label for="code">2FA Kod:</label>
+          <input type="text" id="code" name="code" required maxlength="6" pattern="\d{6}" title="Ange 6 siffror">
+          <button type="submit">Inaktivera 2FA</button>
+        </form>
+      </div>
+
+      <!-- Disable 2FA Confirmation Modal -->
+      <div id="disable2faModal" class="modal">
+        <div class="modal-content">
+          <h3>Bekräfta 2FA Inaktivering</h3>
+          <p>Du kommer att loggas ut efter inaktivering. Logga in igen utan 2FA.</p>
+          <div class="modal-buttons">
+            <button id="confirmDisable2fa" class="btn btn-danger">Inaktivera</button>
+            <button id="cancelDisable2fa" class="btn">Avbryt</button>
+          </div>
+        </div>
+      </div>
+    <% } %>
   </div>
+
+  <script>
+    const disable2faForm = document.getElementById('disable2faForm');
+    const disable2faModal = document.getElementById('disable2faModal');
+    const confirmDisable2fa = document.getElementById('confirmDisable2fa');
+    const cancelDisable2fa = document.getElementById('cancelDisable2fa');
+
+    if (disable2faForm) {
+      disable2faForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        disable2faModal.style.display = 'flex';
+      });
+
+      confirmDisable2fa.onclick = () => {
+        disable2faForm.submit();
+      };
+
+      cancelDisable2fa.onclick = () => {
+        disable2faModal.style.display = 'none';
+      };
+
+      window.onclick = (e) => {
+        if (e.target === disable2faModal) {
+          disable2faModal.style.display = 'none';
+        }
+      };
+    }
+  </script>
 </body>
 </html>

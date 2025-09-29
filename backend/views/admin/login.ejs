@@ -113,6 +113,15 @@
     </div>
   </div>
 
+  <!-- 2FA Success Modal -->
+  <div id="twofaModal" class="modal" style="display: none;">
+    <div class="modal-content" style="text-align: center; padding: 25px;">
+      <h3>2FA Uppdaterad</h3>
+      <p id="twofaMessage"></p>
+      <button id="closeTwofaModalBtn" style="padding: 8px 20px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">OK</button>
+    </div>
+  </div>
+
   <script>
     const successModal = document.getElementById('successModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -128,6 +137,29 @@
     window.onclick = (e) => {
       if (e.target === successModal) {
         successModal.style.display = 'none';
+      }
+    };
+
+    // 2FA Modal
+    const twofaModal = document.getElementById('twofaModal');
+    const closeTwofaModalBtn = document.getElementById('closeTwofaModalBtn');
+    const twofaMessage = document.getElementById('twofaMessage');
+
+    if (window.location.search.includes('2faEnabled=true')) {
+      twofaMessage.textContent = '2FA aktiverat framgångsrikt. Logga in igen.';
+      twofaModal.style.display = 'flex';
+    } else if (window.location.search.includes('2faDisabled=true')) {
+      twofaMessage.textContent = '2FA inaktiverat framgångsrikt. Logga in igen.';
+      twofaModal.style.display = 'flex';
+    }
+
+    closeTwofaModalBtn.onclick = () => {
+      twofaModal.style.display = 'none';
+    };
+
+    window.onclick = (e) => {
+      if (e.target === twofaModal) {
+        twofaModal.style.display = 'none';
       }
     };
   </script>
