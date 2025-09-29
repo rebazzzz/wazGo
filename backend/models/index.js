@@ -35,10 +35,31 @@ async function syncDB() {
   }
 }
 
+async function testConnection() {
+  try {
+    await sequelize.authenticate();
+    return true;
+  } catch (err) {
+    console.error('❌ Database connection failed:', err);
+    return false;
+  }
+}
+
+async function closeDB() {
+  try {
+    await sequelize.close();
+    console.log('✅ Database connection closed.');
+  } catch (err) {
+    console.error('❌ Error closing database connection:', err);
+  }
+}
+
 export default {
   sequelize,
   Contact,
   Page,
   User,
-  syncDB
+  syncDB,
+  testConnection,
+  closeDB
 };

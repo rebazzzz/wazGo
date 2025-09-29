@@ -5,29 +5,15 @@ import { check } from 'express-validator';
 // Mock express-validator
 jest.mock('express-validator', () => ({
   body: jest.fn(() => ({
-    notEmpty: jest.fn(() => ({
-      withMessage: jest.fn(() => ({
-        isLength: jest.fn(() => ({
-          withMessage: jest.fn(() => ({
-            trim: jest.fn(() => ({
-              escape: jest.fn(() => ({
-                isEmail: jest.fn(() => ({
-                  withMessage: jest.fn(() => ({
-                    normalizeEmail: jest.fn(() => ({
-                      optional: jest.fn(() => ({
-                        isIn: jest.fn(() => ({
-                          withMessage: jest.fn(() => ({}))
-                        }))
-                      }))
-                    }))
-                  }))
-                }))
-              }))
-            }))
-          }))
-        }))
-      }))
-    }))
+    notEmpty: jest.fn().mockReturnThis(),
+    withMessage: jest.fn().mockReturnThis(),
+    isLength: jest.fn().mockReturnThis(),
+    trim: jest.fn().mockReturnThis(),
+    escape: jest.fn().mockReturnThis(),
+    isEmail: jest.fn().mockReturnThis(),
+    normalizeEmail: jest.fn().mockReturnThis(),
+    optional: jest.fn().mockReturnThis(),
+    isIn: jest.fn().mockReturnThis()
   })),
   validationResult: jest.fn(() => ({
     isEmpty: jest.fn(() => true),

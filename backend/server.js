@@ -95,6 +95,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/admin/static', express.static(path.join(__dirname, 'public', 'admin')));
 
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs.json', swaggerUi.setup(specs));
+
 // Routes
 app.use('/contact', contactRoutes);
 app.use('/admin', adminRoutes);
