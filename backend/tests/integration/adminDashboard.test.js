@@ -4,6 +4,7 @@ import express from 'express';
 import session from 'express-session';
 import flash from 'connect-flash';
 import bodyParser from 'body-parser';
+import csrf from 'csurf';
 import db from '../../models/index.js';
 import adminRoutes from '../../routes/admin.js';
 
@@ -14,13 +15,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(session({ secret: 'test', resave: false, saveUninitialized: true }));
 app.use(flash());
+const csrfProtection = csrf({ cookie: true });
+app.use(csrfProtection);
+app.get('/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
 app.use('/admin', adminRoutes);
 
 describe('Admin Dashboard Access', () => {
   let testUser;
+  let csrfToken;
 
   beforeAll(async () => {
     await db.syncDB({ force: true });
+    const tokenRes = await request(app).get('/csrf-token');
+    csrfToken = tokenRes.body.csrfToken;
     // Create test admin user
     testUser = await User.create({
       email: 'dashboardadmin@example.com',
@@ -33,7 +42,7 @@ describe('Admin Dashboard Access', () => {
     // First login
     await request(app)
       .post('/admin/login')
-      .send({ email: testUser.email, password: 'password123' })
+      .send({ email: testUser.email, password: 'password123', _csrf: csrfToken })
       .expect(302);
 
     // Then access dashboard
@@ -56,7 +65,7 @@ describe('Admin Dashboard Access', () => {
     // Login first
     await request(app)
       .post('/admin/login')
-      .send({ email: testUser.email, password: 'password123' })
+      .send({ email: testUser.email, password: 'password123', _csrf: csrfToken })
       .expect(302);
 
     // Access contacts
@@ -71,7 +80,7 @@ describe('Admin Dashboard Access', () => {
     // Login first
     await request(app)
       .post('/admin/login')
-      .send({ email: testUser.email, password: 'password123' })
+      .send({ email: testUser.email, password: 'password123', _csrf: csrfToken })
       .expect(302);
 
     // Access change password

@@ -18,7 +18,7 @@ const csrfProtection = csrf({ cookie: true });
 app.use(csrfProtection);
 
 // CSRF token endpoint
-app.get('/csrf', csrfProtection, (req, res) => {
+app.get('/csrf-token', csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
@@ -29,7 +29,7 @@ describe('CSRF Protection', () => {
 
   beforeAll(async () => {
     // Get CSRF token
-    const tokenRes = await request(app).get('/csrf');
+    const tokenRes = await request(app).get('/csrf-token');
     csrfToken = tokenRes.body.csrfToken;
   });
 

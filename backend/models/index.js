@@ -10,11 +10,13 @@ const Page = PageModel(sequelize);
 const User = UserModel(sequelize);
 
 // Sync-funktion
-async function syncDB() {
+async function syncDB(options = {}) {
   try {
     await sequelize.authenticate();
     console.log('✅ Databasen är ansluten.');
-    await sequelize.sync({ alter: true });
+    await sequelize.drop();
+    console.log('✅ Dropped all tables.');
+    await sequelize.sync({ alter: true, ...options });
     console.log('✅ Modellerna syncade.');
 
     // Skapa standard admin om den inte finns

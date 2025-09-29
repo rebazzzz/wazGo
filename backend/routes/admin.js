@@ -2,7 +2,6 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import csrf from 'csurf';
 import rateLimit from 'express-rate-limit';
 import { body } from 'express-validator';
@@ -10,16 +9,13 @@ import auth from '../middleware/auth.js';
 import * as adminController from '../controllers/adminController.js';
 import logger from '../utils/logger.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const router = express.Router();
 const csrfProtection = csrf();
 
 // Multer config for uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads'));
+    cb(null, path.join(process.cwd(), 'backend', 'uploads'));
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));

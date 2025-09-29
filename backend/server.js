@@ -99,12 +99,18 @@ app.use('/admin/static', express.static(path.join(__dirname, 'public', 'admin'))
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs.json', swaggerUi.setup(specs));
 
+// CSRF protection for tests
+const csrfProtection = csrf({ cookie: true });
+
+if (process.env.NODE_ENV === 'test') {
+  app.get('/csrf-token', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+  });
+}
+
 // Routes
 app.use('/contact', contactRoutes);
 app.use('/admin', adminRoutes);
-
-// API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Frontend
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));

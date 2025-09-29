@@ -4,6 +4,7 @@ import express from 'express';
 import session from 'express-session';
 import flash from 'connect-flash';
 import bodyParser from 'body-parser';
+import csrf from 'csurf';
 import rateLimit from 'express-rate-limit';
 import contactRoutes from '../../routes/contact.js';
 
@@ -12,6 +13,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(session({ secret: 'test', resave: false, saveUninitialized: true }));
 app.use(flash());
+const csrfProtection = csrf({ cookie: true });
+app.use(csrfProtection);
+app.get('/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
 
 // Rate limiter (reduced for testing)
 const contactLimiter = rateLimit({
