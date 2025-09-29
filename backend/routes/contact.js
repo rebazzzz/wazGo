@@ -2,6 +2,7 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
+import { body, validationResult } from 'express-validator';
 import db from '../models/index.js';
 
 const { Contact } = db;
@@ -19,14 +20,45 @@ const contactLimiter = rateLimit({
   legacyHeaders: false
 });
 
+// Validation rules for contact form
+const contactValidation = [
+  body('name')
+    .notEmpty().withMessage('Namn är obligatoriskt.')
+    .isLength({ min: 2, max: 100 }).withMessage('Namn måste vara mellan 2 och 100 tecken.')
+    .trim()
+    .escape(),
+  body('email')
+    .isEmail().withMessage('Ogiltig e-postadress.')
+    .normalizeEmail(),
+  body('company')
+    .optional()
+    .isLength({ max: 100 }).withMessage('Företag får inte vara längre än 100 tecken.')
+    .trim()
+    .escape(),
+  body('industry')
+    .optional()
+    .isIn(['restaurant', 'retail', 'nonprofit', 'other']).withMessage('Ogiltig bransch.'),
+  body('otherIndustry')
+    .optional()
+    .isLength({ max: 100 }).withMessage('Annan bransch får inte vara längre än 100 tecken.')
+    .trim()
+    .escape(),
+  body('message')
+    .notEmpty().withMessage('Meddelande är obligatoriskt.')
+    .isLength({ min: 10, max: 1000 }).withMessage('Meddelande måste vara mellan 10 och 1000 tecken.')
+    .trim()
+    .escape()
+];
+
 // POST /contact – hantera formulär
-router.post('/', contactLimiter, async (req, res) => {
+router.post('/', contactLimiter, contactValidation, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, error: errors.array()[0].msg });
+  }
+
   try {
     const { name, email, company, industry, otherIndustry, message } = req.body;
-
-    if (!name || !email || !message) {
-      return res.status(400).json({ success: false, error: 'Alla fält måste fyllas i.' });
-    }
 
     // Spara i databasen
     const savedContact = await Contact.create({
