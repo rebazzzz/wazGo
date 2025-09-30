@@ -8,3 +8,5 @@ operable program or batch file.
 2025-09-30T15:55:52.726Z [error]: Backup verification failed: Cannot read properties of undefined (reading 'count')
 2025-09-30T15:57:28.992Z [error]: Backup verification failed: Cannot read properties of undefined (reading 'count')
 2025-09-30T15:58:36.434Z [error]: Backup verification failed: Cannot read properties of undefined (reading 'count')
+2025-09-30T16:27:27.747Z [error]: Health check failed: Database connection error
+2025-09-30T16:35:27.423Z [error]: Health check failed: Database connection error

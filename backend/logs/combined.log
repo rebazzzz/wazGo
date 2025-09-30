@@ -53,3 +53,5 @@ operable program or batch file.
 2025-09-30T15:58:36.434Z [error]: Backup verification failed: Cannot read properties of undefined (reading 'count')
 2025-09-30T15:59:29.859Z [info]: Database restored to test db: wazgo_verify_1759247969362
 2025-09-30T15:59:30.047Z [info]: Backup verification successful for: ./backups/backup-2025-09-30T15-58-15-884Z
+2025-09-30T16:27:27.747Z [error]: Health check failed: Database connection error
+2025-09-30T16:35:27.423Z [error]: Health check failed: Database connection error

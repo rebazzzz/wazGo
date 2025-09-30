@@ -125,9 +125,19 @@ if (process.env.NODE_ENV === 'test') {
 // Routes
 app.use('/contact', contactRoutes);
 app.use('/admin', adminRoutes);
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+// Health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    await db.authenticate();
+    res.json({ status: 'healthy', database: 'connected' });
+  } catch (error) {
+    logger.error('Health check failed: Database connection error', { error: error.message });
+    res.status(503).json({ status: 'unhealthy', database: 'disconnected' });
+  }
+});
 
 // Frontend
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get("/demos", (req, res) => res.sendFile(path.join(__dirname, 'public', 'demos.html')));
 app.get("/kontakta_oss", (req, res) => res.sendFile(path.join(__dirname, 'public', 'kontakta_oss.html')));
 app.get("/integritetspolicy", (req, res) => res.sendFile(path.join(__dirname, 'public', 'integritetspolicy.html')));
