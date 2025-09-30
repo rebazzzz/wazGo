@@ -155,6 +155,9 @@
                 <label for="message">Meddelande</label>
                 <textarea id="message" name="message" required aria-required="true" autocomplete="off"></textarea>
               </div>
+              <div class="form-group">
+                <div class="g-recaptcha" data-sitekey=""></div>
+              </div>
               <input type="hidden" name="_csrf" id="csrfToken">
               <button type="submit" class="btn">Skicka meddelande</button>
             </form>
@@ -297,6 +300,22 @@
       }
     ]
   }
+  </script>
+
+  <!-- reCAPTCHA -->
+  <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit" async defer></script>
+  <script>
+    function onRecaptchaLoadCallback() {
+      const recaptchaElement = document.querySelector('.g-recaptcha');
+      if (recaptchaElement) {
+        const siteKey = recaptchaElement.getAttribute('data-sitekey');
+        if (siteKey) {
+          grecaptcha.render(recaptchaElement, {
+            'sitekey': siteKey
+          });
+        }
+      }
+    }
   </script>
 
   <!-- Egen JS -->

@@ -32,7 +32,41 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // === Contact form submission with professional message ===
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Fetch and set reCAPTCHA site key with timeout
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5-second timeout
+
+        const response = await fetch('/api/recaptcha-site-key', {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const recaptchaElement = document.querySelector('.g-recaptcha');
+        if (recaptchaElement && data.siteKey) {
+            recaptchaElement.setAttribute('data-sitekey', data.siteKey);
+            // If reCAPTCHA is already loaded, render it
+            if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
+                grecaptcha.render(recaptchaElement);
+            }
+        } else {
+            console.warn('reCAPTCHA site key not available');
+        }
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.error('reCAPTCHA site key fetch timed out after 5 seconds');
+        } else {
+            console.error('Failed to load reCAPTCHA site key:', error);
+        }
+        // Gracefully handle error - CAPTCHA will not be available, form submission will show appropriate error
+    }
+
     const contactForm = document.getElementById('contactForm');
     const formMessage = document.getElementById('form-message');
     const industrySelect = document.getElementById('industry');
@@ -61,7 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 company: document.getElementById('company').value.trim(),
                 industry: document.getElementById('industry').value,
                 otherIndustry: document.getElementById('other-industry').value.trim(),
-                message: document.getElementById('message').value.trim()
+                message: document.getElementById('message').value.trim(),
+                'g-recaptcha-response': grecaptcha.getResponse()
             };
 
             // Client-side validation
@@ -146,6 +181,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return;
             }
+            if (!formData['g-recaptcha-response']) {
+                formMessage.textContent = 'CAPTCHA-verifiering krävs.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
 
             // Get CSRF token
             let csrfToken;
@@ -181,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     formMessage.classList.add('success', 'show');
                     contactForm.reset();
                     if (otherIndustryGroup) otherIndustryGroup.style.display = 'none';
+                    grecaptcha.reset();
                 } else {
                     formMessage.textContent = json.error || 'Något gick fel, försök igen.';
                     formMessage.classList.add('error', 'show');

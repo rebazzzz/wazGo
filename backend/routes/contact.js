@@ -1,11 +1,11 @@
 // routes/contact.js
 import express from 'express';
 import nodemailer from 'nodemailer';
-import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import csrf from 'csurf';
 import db from '../models/index.js';
 import logger from '../utils/logger.js';
+import Recaptcha from 'google-recaptcha-v2';
 
 const { Contact } = db;
 
@@ -18,16 +18,9 @@ router.get('/csrf', csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-// Rate limiter for contact form
-const contactLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 13, // limit each IP to 3 requests per windowMs
-  handler: (req, res) => {
-    res.status(429).json({ success: false, error: 'För många kontaktförfrågningar från din IP-adress. Försök igen om 15 minuter.' });
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
+// Session-based rate limiter for contact form
+const SESSION_RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+const SESSION_RATE_LIMIT_MAX = 3; // max 3 submissions per session per window
 
 // Validation rules for contact form
 const contactValidation = [
@@ -56,13 +49,39 @@ const contactValidation = [
     .notEmpty().withMessage('Meddelande är obligatoriskt.')
     .isLength({ min: 10, max: 1000 }).withMessage('Meddelande måste vara mellan 10 och 1000 tecken.')
     .trim()
-    .escape()
+    .escape(),
+  body('g-recaptcha-response')
+    .notEmpty().withMessage('CAPTCHA-verifiering krävs.')
 ];
 
-router.post('/', csrfProtection, contactLimiter, contactValidation, async (req, res) => {
+router.post('/', csrfProtection, contactValidation, async (req, res) => {
+  // Session-based rate limiting
+  if (!req.session.contactSubmissions) {
+    req.session.contactSubmissions = [];
+  }
+  const now = Date.now();
+  req.session.contactSubmissions = req.session.contactSubmissions.filter(
+    timestamp => now - timestamp < SESSION_RATE_LIMIT_WINDOW
+  );
+  if (req.session.contactSubmissions.length >= SESSION_RATE_LIMIT_MAX) {
+    return res.status(429).json({ success: false, error: 'För många kontaktförfrågningar från denna session. Försök igen senare.' });
+  }
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, error: errors.array()[0].msg });
+  }
+
+  // Verify CAPTCHA
+  try {
+    const recaptcha = new Recaptcha(process.env.RECAPTCHA_SITE_KEY, process.env.RECAPTCHA_SECRET_KEY);
+    const isValid = await recaptcha.verify(req.body['g-recaptcha-response']);
+    if (!isValid) {
+      return res.status(400).json({ success: false, error: 'CAPTCHA-verifiering misslyckades.' });
+    }
+  } catch (captchaErr) {
+    logger.error('CAPTCHA verification error', { error: captchaErr.message });
+    return res.status(500).json({ success: false, error: 'CAPTCHA-verifiering misslyckades.' });
   }
 
   try {
@@ -86,6 +105,9 @@ router.post('/', csrfProtection, contactLimiter, contactValidation, async (req, 
       otherIndustry: industry === 'other' ? otherIndustry : null,
       message
     });
+
+    // Record successful submission for rate limiting
+    req.session.contactSubmissions.push(now);
 
     // Skicka JSON-svar till frontend omedelbart
     res.json({ success: true, message: 'Tack! Vi har mottagit ditt meddelande.' });

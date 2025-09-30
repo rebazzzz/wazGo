@@ -44,7 +44,8 @@ const getEnvVar = (varName) => {
 const requiredEnvVars = [
   'SESSION_SECRET',
   'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS',
-  'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM'
+  'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM',
+  'RECAPTCHA_SITE_KEY', 'RECAPTCHA_SECRET_KEY'
 ];
 
 const missingVars = requiredEnvVars.filter(varName => !getEnvVar(varName));
@@ -78,11 +79,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.google.com", "https://www.gstatic.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", "data:", "https:", "https://www.gstatic.com"],
+      frameSrc: ["https://www.google.com"],
     },
   },
 }));
@@ -166,6 +168,11 @@ app.get('/health', async (req, res) => {
     logger.error('Health check failed: Database connection error', { error: error.message });
     res.status(503).json({ status: 'unhealthy', database: 'disconnected' });
   }
+});
+
+// API for reCAPTCHA site key
+app.get('/api/recaptcha-site-key', (req, res) => {
+  res.json({ siteKey: process.env.RECAPTCHA_SITE_KEY || '' });
 });
 
 // Frontend
