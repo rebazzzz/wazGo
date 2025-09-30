@@ -64,6 +64,89 @@ document.addEventListener('DOMContentLoaded', () => {
                 message: document.getElementById('message').value.trim()
             };
 
+            // Client-side validation
+            if (!formData.name) {
+                formMessage.textContent = 'Namn är obligatoriskt.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+            if (formData.name.length < 2 || formData.name.length > 100) {
+                formMessage.textContent = 'Namn måste vara mellan 2 och 100 tecken.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+            if (!formData.email) {
+                formMessage.textContent = 'E-post är obligatoriskt.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                formMessage.textContent = 'Ogiltig e-postadress.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+            if (!formData.company) {
+                formMessage.textContent = 'Företag är obligatoriskt.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+            if (!formData.message) {
+                formMessage.textContent = 'Meddelande är obligatoriskt.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+            if (formData.message.length < 10 || formData.message.length > 1000) {
+                formMessage.textContent = 'Meddelande måste vara mellan 10 och 1000 tecken.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+            if (formData.industry === 'other' && !formData.otherIndustry) {
+                formMessage.textContent = 'Ange bransch är obligatoriskt när "Annan" är vald.';
+                formMessage.classList.add('error', 'show');
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Skicka';
+                }
+                return;
+            }
+
             // Get CSRF token
             let csrfToken;
             try {

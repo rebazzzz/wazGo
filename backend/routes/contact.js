@@ -21,7 +21,7 @@ router.get('/csrf', csrfProtection, (req, res) => {
 // Rate limiter for contact form
 const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // limit each IP to 3 requests per windowMs
+  max: 13, // limit each IP to 3 requests per windowMs
   handler: (req, res) => {
     res.status(429).json({ success: false, error: 'För många kontaktförfrågningar från din IP-adress. Försök igen om 15 minuter.' });
   },
@@ -40,7 +40,7 @@ const contactValidation = [
     .isEmail().withMessage('Ogiltig e-postadress.')
     .normalizeEmail(),
   body('company')
-    .optional()
+    .notEmpty().withMessage('Företag är obligatoriskt.')
     .isLength({ max: 100 }).withMessage('Företag får inte vara längre än 100 tecken.')
     .trim()
     .escape(),

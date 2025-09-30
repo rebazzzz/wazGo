@@ -15,7 +15,12 @@ export default (sequelize) => {
     sequelize,
     modelName: 'Contact',
     tableName: 'contacts',
-    timestamps: true
+    timestamps: true,
+    indexes: [
+      {
+        fields: ['createdAt']
+      }
+    ]
   });
 
   return Contact;

@@ -207,10 +207,10 @@ export const showChangePassword = (req, res) => {
 };
 
 /**
- * Changes the user's password after validation and destroys session.
+ * Changes the user's password after validation. If 2FA is enabled, redirects to verification first.
  * @param {Object} req - Express request object with current and new passwords in body
  * @param {Object} res - Express response object
- * @returns {void} Redirects to login with flash message or back to change password on error
+ * @returns {void} Redirects to 2FA verification, login with flash message, or back to change password on error
  */
 export const changePassword = async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
@@ -248,8 +248,36 @@ export const changePassword = async (req, res) => {
       return res.redirect('/admin/change-password');
     }
 
-    // Update password (hooks will hash it)
-    user.password = trimmedNewPassword;
+    // If 2FA is enabled, store password change data and redirect to verification
+    if (user.twoFactorEnabled) {
+      req.session.pendingPasswordChange = {
+        newPassword: trimmedNewPassword,
+        userId: userId
+      };
+      return res.redirect('/admin/verify-2fa?context=password-change');
+    }
+
+    // If 2FA is not enabled, proceed with password change directly
+    await performPasswordChange(req, res, userId, trimmedNewPassword);
+  } catch (err) {
+    console.error('Change password error:', err);
+    req.flash('error', 'Kunde inte ändra lösenordet');
+    res.redirect('/admin/change-password');
+  }
+};
+
+/**
+ * Helper function to perform the actual password change and session destruction.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {number} userId - User ID
+ * @param {string} newPassword - New password to set
+ * @returns {void} Redirects to login with success message
+ */
+const performPasswordChange = async (req, res, userId, newPassword) => {
+  try {
+    const user = await User.findByPk(userId);
+    user.password = newPassword;
     await user.save();
 
     req.session.destroy((err) => {
@@ -260,7 +288,7 @@ export const changePassword = async (req, res) => {
       res.redirect('/admin/login?passwordChanged=true');
     });
   } catch (err) {
-    console.error('Change password error:', err);
+    console.error('Perform password change error:', err);
     req.flash('error', 'Kunde inte ändra lösenordet');
     res.redirect('/admin/change-password');
   }
@@ -431,42 +459,73 @@ export const disable2FA = async (req, res) => {
 };
 
 /**
- * Renders the 2FA verification page if pending 2FA in session.
+ * Renders the 2FA verification page if pending 2FA or password change in session.
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
- * @returns {void} Renders admin/verify_2fa.ejs or redirects to login
+ * @returns {void} Renders admin/verify_2fa.ejs or redirects to login/dashboard
  */
 export const showVerify2FA = (req, res) => {
-  if (!req.session.pending2FA) {
-    return res.redirect('/admin/login');
+  const context = req.query.context || 'login';
+  let title = 'Verify 2FA';
+  let redirectUrl = '/admin/login';
+
+  if (context === 'password-change') {
+    title = 'Verify 2FA for Password Change';
+    redirectUrl = '/admin/change-password';
   }
-  res.render('admin/verify_2fa', { title: 'Verify 2FA', csrfToken: req.csrfToken() });
+
+  // Check if there's a valid pending operation
+  if (context === 'login' && !req.session.pending2FA) {
+    return res.redirect('/admin/login');
+  } else if (context === 'password-change' && !req.session.pendingPasswordChange) {
+    return res.redirect('/admin/dashboard');
+  }
+
+  res.render('admin/verify_2fa', {
+    title,
+    context,
+    csrfToken: req.csrfToken()
+  });
 };
 
 /**
- * Verifies the 2FA code and logs in the user if valid.
+ * Verifies the 2FA code for login or password change.
  * @param {Object} req - Express request object with 2FA code in body
  * @param {Object} res - Express response object
- * @returns {void} Redirects to dashboard on success or back to verify on error
+ * @returns {void} Redirects based on context and verification result
  */
 export const verify2FA = async (req, res) => {
   const { code } = req.body;
+  const context = req.query.context || 'login';
   const speakeasy = await import('speakeasy');
 
-  if (!req.session.pending2FA) {
+  let userId;
+  let user;
+
+  if (context === 'login') {
+    if (!req.session.pending2FA) {
+      return res.redirect('/admin/login');
+    }
+    userId = req.session.pending2FA;
+  } else if (context === 'password-change') {
+    if (!req.session.pendingPasswordChange) {
+      return res.redirect('/admin/dashboard');
+    }
+    userId = req.session.pendingPasswordChange.userId;
+  } else {
     return res.redirect('/admin/login');
   }
 
-  const user = await User.findByPk(req.session.pending2FA);
+  user = await User.findByPk(userId);
 
-  console.log('Verify 2FA - Secret:', user.twoFactorSecret);
-  console.log('Verify 2FA - User code:', code.trim());
+  console.log(`Verify 2FA (${context}) - Secret:`, user.twoFactorSecret);
+  console.log(`Verify 2FA (${context}) - User code:`, code.trim());
 
   const expectedToken = speakeasy.totp({
     secret: user.twoFactorSecret,
     encoding: 'base32'
   });
-  console.log('Verify 2FA - Expected token:', expectedToken);
+  console.log(`Verify 2FA (${context}) - Expected token:`, expectedToken);
 
   const verified = speakeasy.totp.verify({
     secret: user.twoFactorSecret,
@@ -475,14 +534,20 @@ export const verify2FA = async (req, res) => {
     window: 20
   });
 
-  console.log('Verify 2FA - Verified:', verified);
+  console.log(`Verify 2FA (${context}) - Verified:`, verified);
 
   if (verified) {
-    req.session.user = { id: user.id, email: user.email, role: user.role };
-    delete req.session.pending2FA;
-    res.redirect('/admin/dashboard');
+    if (context === 'login') {
+      req.session.user = { id: user.id, email: user.email, role: user.role };
+      delete req.session.pending2FA;
+      res.redirect('/admin/dashboard');
+    } else if (context === 'password-change') {
+      const { newPassword } = req.session.pendingPasswordChange;
+      delete req.session.pendingPasswordChange;
+      await performPasswordChange(req, res, userId, newPassword);
+    }
   } else {
     req.flash('error', 'Invalid 2FA code');
-    res.redirect('/admin/verify-2fa');
+    res.redirect(`/admin/verify-2fa?context=${context}`);
   }
 };
