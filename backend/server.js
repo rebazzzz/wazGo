@@ -111,7 +111,8 @@ app.use('/admin/static', express.static(path.join(__dirname, 'public', 'admin'),
 
 // Swagger API Documentation
 app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs.json', swaggerUi.setup(specs));
+app.get('/api-docs', swaggerUi.setup(specs));
+app.get('/api-docs.json', (req, res) => res.json(specs));
 
 // CSRF protection for tests
 const csrfProtection = csrf({ cookie: true });
@@ -129,7 +130,7 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 // Health check endpoint
 app.get('/health', async (req, res) => {
   try {
-    await db.authenticate();
+    await db.sequelize.authenticate();
     res.json({ status: 'healthy', database: 'connected' });
   } catch (error) {
     logger.error('Health check failed: Database connection error', { error: error.message });
