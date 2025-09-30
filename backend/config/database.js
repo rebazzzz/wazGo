@@ -1,6 +1,7 @@
 // config/database.js
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 // Load test env if in test mode
 if (process.env.NODE_ENV === 'test') {
@@ -9,13 +10,27 @@ if (process.env.NODE_ENV === 'test') {
   dotenv.config();
 }
 
+// Function to get env var, checking file if *_FILE is set
+const getEnvVar = (varName) => {
+  const fileVar = `${varName}_FILE`;
+  if (process.env[fileVar]) {
+    try {
+      return fs.readFileSync(process.env[fileVar], 'utf8').trim();
+    } catch (err) {
+      console.error(`Error reading ${fileVar}:`, err.message);
+      process.exit(1);
+    }
+  }
+  return process.env[varName];
+};
+
 const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASS,
+  getEnvVar('DB_NAME'),
+  getEnvVar('DB_USER'),
+  getEnvVar('DB_PASS'),
   {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
+    host: getEnvVar('DB_HOST') || 'localhost',
+    port: getEnvVar('DB_PORT') || 5432,
     dialect: 'postgres',
     logging: false,
     pool: {

@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import session from 'express-session';
 import flash from 'connect-flash';
 import csrf from 'csurf';
@@ -24,6 +25,34 @@ import cron from 'node-cron';
 import { backupDatabase, verifyBackup, cleanupOldBackups, getBackupFiles } from './utils/backup.js';
 
 dotenv.config();
+
+// Function to get env var, checking file if *_FILE is set
+const getEnvVar = (varName) => {
+  const fileVar = `${varName}_FILE`;
+  if (process.env[fileVar]) {
+    try {
+      return fs.readFileSync(process.env[fileVar], 'utf8').trim();
+    } catch (err) {
+      console.error(`Error reading ${fileVar}:`, err.message);
+      process.exit(1);
+    }
+  }
+  return process.env[varName];
+};
+
+// Check for required environment variables
+const requiredEnvVars = [
+  'SESSION_SECRET',
+  'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS',
+  'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM'
+];
+
+const missingVars = requiredEnvVars.filter(varName => !getEnvVar(varName));
+if (missingVars.length > 0) {
+  console.error('Missing required environment variables:', missingVars.join(', '));
+  console.error('Please set these environment variables or create a .env file based on .env.example');
+  process.exit(1);
+}
 
 // Initialize Sentry
 Sentry.init({
@@ -66,7 +95,7 @@ app.use(cookieParser());
 
 // Sessions + flash
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'hemlignyckel',
+  secret: getEnvVar('SESSION_SECRET'),
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -124,6 +153,7 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 // Routes
+
 app.use('/contact', contactRoutes);
 app.use('/admin', adminRoutes);
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
@@ -157,6 +187,7 @@ app.use((err, req, res, next) => {
     res.status(500).send('Internal server error');
   }
 });
+
 
 // Seed admin user if not exists
 const seedAdminUser = async () => {

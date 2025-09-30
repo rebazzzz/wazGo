@@ -2,6 +2,52 @@
 
 This setup automates the build, run, and monitoring of the Waz Go backend application using Docker Compose.
 
+## Environment Setup
+
+### Secrets Management
+
+For security, sensitive credentials are managed using Docker secrets. Before running the application:
+
+1. Create the secrets directory:
+   ```
+   mkdir secrets
+   ```
+
+2. Copy example files and fill with actual values:
+   ```
+   cp secrets/session_secret.txt.example secrets/session_secret.txt
+   cp secrets/db_pass.txt.example secrets/db_pass.txt
+   cp secrets/smtp_pass.txt.example secrets/smtp_pass.txt
+   ```
+
+3. Edit the secret files with your actual credentials:
+   - `secrets/session_secret.txt`: A secure random string for session encryption
+   - `secrets/db_pass.txt`: Database password
+   - `secrets/smtp_pass.txt`: SMTP password (e.g., Gmail app password)
+
+**Important**: Never commit actual secret files to version control. The `secrets/` directory is ignored by git.
+
+### Alternative: Environment Variables
+
+For development without Docker secrets, you can set environment variables directly:
+
+```bash
+export SESSION_SECRET=your_secure_session_secret
+export DB_HOST=localhost
+export DB_PORT=5432
+export DB_NAME=wazgo
+export DB_USER=postgres
+export DB_PASS=your_db_password
+export SMTP_HOST=smtp.gmail.com
+export SMTP_PORT=587
+export SMTP_USER=your_email@gmail.com
+export SMTP_PASS=your_smtp_password
+export EMAIL_FROM="Waz Go <your_email@gmail.com>"
+export SMTP_TO=admin@wazgo.se
+```
+
+Or create a `.env` file based on `.env.example`.
+
 ## Quick Start
 
 ### Windows
@@ -58,9 +104,11 @@ docker-compose exec app npm test
 
 ### Clean Up
 ```
-docker-compose down -v
+docker-compose down
 docker system prune -f
 ```
+
+**Note**: The above command preserves database data. If you want to remove all data (including database), use `docker-compose down -v`.
 
 ## Development Features
 

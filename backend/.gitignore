@@ -1,7 +1,9 @@
 node_modules/
 .env
+.env.docker
 .env.test
 uploads/
 backups/
 logs/
 *.sqlite
+secrets/

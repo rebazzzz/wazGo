@@ -3,7 +3,6 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import csrf from 'csurf';
-import rateLimit from 'express-rate-limit';
 import { body } from 'express-validator';
 import auth from '../middleware/auth.js';
 import * as adminController from '../controllers/adminController.js';
@@ -47,16 +46,9 @@ const upload = multer({
   fileFilter
 });
 
-// Rate limiter for login
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
-  message: 'För många inloggningsförsök, försök igen senare.'
-});
-
 // Login
 router.get('/login', csrfProtection, adminController.showLogin);
-router.post('/login', loginLimiter, csrfProtection, [
+router.post('/login', csrfProtection, [
   body('email').isEmail().normalizeEmail(),
   body('password').isLength({ min: 6 }).withMessage('Lösenord måste vara minst 6 tecken')
 ], adminController.doLogin);

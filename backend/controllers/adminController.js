@@ -90,7 +90,7 @@ export const doLogin = async (req, res) => {
     return res.redirect('/admin/login');
   }
   const { email, password } = req.body;
-  console.log('Login attempt:', { email, password, body: req.body });
+  logger.info('Login attempt started', { email, ip: req.ip, userAgent: req.get('User-Agent') });
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -127,6 +127,8 @@ export const doLogin = async (req, res) => {
     user.lockUntil = null;
     await user.save();
 
+    logger.info('Login successful', { email, ip: req.ip, userAgent: req.get('User-Agent') });
+
     if (user.twoFactorEnabled) {
       req.session.pending2FA = user.id;
       res.redirect('/admin/verify-2fa');
@@ -135,7 +137,7 @@ export const doLogin = async (req, res) => {
       res.redirect('/admin/dashboard');
     }
   } catch (err) {
-    console.error('Login error:', err);
+    logger.error('Login error', { error: err.message, email, ip: req.ip, userAgent: req.get('User-Agent') });
     req.flash('error', 'Inloggning misslyckades');
     res.redirect('/admin/login');
   }
@@ -398,14 +400,7 @@ export const enable2FA = async (req, res) => {
   const userId = req.session.user.id;
   const user = await User.findByPk(userId);
 
-  console.log('Enable 2FA - Secret:', user.twoFactorSecret);
-  console.log('Enable 2FA - User code:', code.trim());
-
-  const expectedToken = speakeasy.totp({
-    secret: user.twoFactorSecret,
-    encoding: 'base32'
-  });
-  console.log('Enable 2FA - Expected token:', expectedToken);
+  logger.info('2FA enable attempt', { userId, ip: req.ip, userAgent: req.get('User-Agent') });
 
   const verified = speakeasy.totp.verify({
     secret: user.twoFactorSecret,
@@ -414,19 +409,19 @@ export const enable2FA = async (req, res) => {
     window: 20
   });
 
-  console.log('Enable 2FA - Verified:', verified);
-
   if (verified) {
     user.twoFactorEnabled = true;
     await user.save();
+    logger.info('2FA enabled successfully', { userId, ip: req.ip });
     req.session.destroy((err) => {
       if (err) {
-        console.error('Session destroy error:', err);
+        logger.error('Session destroy error during 2FA enable', { error: err.message, userId });
         return res.redirect('/admin/login');
       }
       res.redirect('/admin/login?2faEnabled=true');
     });
   } else {
+    logger.warn('2FA enable failed: invalid code', { userId, ip: req.ip, userAgent: req.get('User-Agent') });
     req.flash('error', 'Invalid 2FA code');
     res.redirect('/admin/setup-2fa');
   }
@@ -445,14 +440,7 @@ export const disable2FA = async (req, res) => {
   const userId = req.session.user.id;
   const user = await User.findByPk(userId);
 
-  console.log('Disable 2FA - Secret:', user.twoFactorSecret);
-  console.log('Disable 2FA - User code:', code.trim());
-
-  const expectedToken = speakeasy.totp({
-    secret: user.twoFactorSecret,
-    encoding: 'base32'
-  });
-  console.log('Disable 2FA - Expected token:', expectedToken);
+  logger.info('2FA disable attempt', { userId, ip: req.ip, userAgent: req.get('User-Agent') });
 
   const verified = speakeasy.totp.verify({
     secret: user.twoFactorSecret,
@@ -461,20 +449,20 @@ export const disable2FA = async (req, res) => {
     window: 20
   });
 
-  console.log('Disable 2FA - Verified:', verified);
-
   if (verified) {
     user.twoFactorEnabled = false;
     user.twoFactorSecret = null; // Optionally clear the secret
     await user.save();
+    logger.info('2FA disabled successfully', { userId, ip: req.ip });
     req.session.destroy((err) => {
       if (err) {
-        console.error('Session destroy error:', err);
+        logger.error('Session destroy error during 2FA disable', { error: err.message, userId });
         return res.redirect('/admin/login');
       }
       res.redirect('/admin/login?2faDisabled=true');
     });
   } else {
+    logger.warn('2FA disable failed: invalid code', { userId, ip: req.ip, userAgent: req.get('User-Agent') });
     req.flash('error', 'Invalid 2FA code');
     res.redirect('/admin/dashboard');
   }
@@ -540,14 +528,7 @@ export const verify2FA = async (req, res) => {
 
   user = await User.findByPk(userId);
 
-  console.log(`Verify 2FA (${context}) - Secret:`, user.twoFactorSecret);
-  console.log(`Verify 2FA (${context}) - User code:`, code.trim());
-
-  const expectedToken = speakeasy.totp({
-    secret: user.twoFactorSecret,
-    encoding: 'base32'
-  });
-  console.log(`Verify 2FA (${context}) - Expected token:`, expectedToken);
+  logger.info(`2FA verification attempt (${context})`, { userId, ip: req.ip, userAgent: req.get('User-Agent') });
 
   const verified = speakeasy.totp.verify({
     secret: user.twoFactorSecret,
@@ -556,9 +537,8 @@ export const verify2FA = async (req, res) => {
     window: 20
   });
 
-  console.log(`Verify 2FA (${context}) - Verified:`, verified);
-
   if (verified) {
+    logger.info(`2FA verification successful (${context})`, { userId, ip: req.ip });
     if (context === 'login') {
       req.session.user = { id: user.id, email: user.email, role: user.role };
       delete req.session.pending2FA;
@@ -569,6 +549,7 @@ export const verify2FA = async (req, res) => {
       await performPasswordChange(req, res, userId, newPassword);
     }
   } else {
+    logger.warn(`2FA verification failed (${context}): invalid code`, { userId, ip: req.ip, userAgent: req.get('User-Agent') });
     req.flash('error', 'Invalid 2FA code');
     res.redirect(`/admin/verify-2fa?context=${context}`);
   }
