@@ -1,5 +1,7 @@
 node_modules/
 .env
+.env.test
 uploads/
 backups/
+logs/
 *.sqlite
