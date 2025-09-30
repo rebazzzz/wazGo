@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import csrf from 'csurf';
+import db from '../../models/index.js';
 import contactRoutes from '../../routes/contact.js';
 
 const app = express();
@@ -17,7 +18,8 @@ describe('Contact Routes', () => {
   let csrfToken;
 
   beforeAll(async () => {
-    const tokenRes = await request(app).get('/csrf-token');
+    await db.syncDB({ force: true });
+    const tokenRes = await request(app).get('/contact/csrf');
     csrfToken = tokenRes.body.csrfToken;
   });
 
@@ -27,6 +29,8 @@ describe('Contact Routes', () => {
       .send({
         name: 'Test User',
         email: 'test@example.com',
+        company: 'Test Company',
+        industry: 'restaurant',
         message: 'Test message',
         _csrf: csrfToken
       })
@@ -41,6 +45,8 @@ describe('Contact Routes', () => {
       .send({
         name: 'Test User',
         email: 'invalid-email',
+        company: 'Test Company',
+        industry: 'restaurant',
         message: 'Test message',
         _csrf: csrfToken
       })

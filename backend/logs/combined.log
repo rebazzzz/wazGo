@@ -34,3 +34,22 @@
 2025-09-30T15:07:39.003Z [info]: Contact form submission
 2025-09-30T15:08:08.205Z [info]: Contact form submission
 2025-09-30T15:08:20.015Z [info]: Contact form submission
+2025-09-30T15:09:29.444Z [info]: Contact form submission
+2025-09-30T15:09:50.342Z [warn]: Failed login attempt: wrong password
+2025-09-30T15:48:46.823Z [error]: Database backup failed: Command failed: pg_dump --host=localhost --port=5432 --username=postgres --dbname=wazgo --no-password --format=c --compress=9 --file="C:\Users\Rebaz\Desktop\wazGo\backend\backups\backup-2025-09-30T15-48-46-806Z.sql"
+'pg_dump' is not recognized as an internal or external command,
+operable program or batch file.
+
+2025-09-30T15:52:11.477Z [info]: Database backup created: C:\Users\Rebaz\Desktop\wazGo\backend\backups\backup-2025-09-30T15-52-11-095Z
+2025-09-30T15:53:45.096Z [error]: Database restore failed: UserModel is not a function
+2025-09-30T15:53:45.099Z [error]: Backup verification failed: UserModel is not a function
+2025-09-30T15:55:52.722Z [info]: Database restored to test db: wazgo_verify_1759247752164
+2025-09-30T15:55:52.726Z [error]: Backup verification failed: Cannot read properties of undefined (reading 'count')
+2025-09-30T15:57:28.986Z [info]: Database restored to test db: wazgo_verify_1759247848361
+2025-09-30T15:57:28.992Z [error]: Backup verification failed: Cannot read properties of undefined (reading 'count')
+2025-09-30T15:57:54.343Z [info]: Database backup created: C:\Users\Rebaz\Desktop\wazGo\backend\backups\backup-2025-09-30T15-57-53-977Z
+2025-09-30T15:58:16.004Z [info]: Database backup created: C:\Users\Rebaz\Desktop\wazGo\backend\backups\backup-2025-09-30T15-58-15-884Z
+2025-09-30T15:58:36.429Z [info]: Database restored to test db: wazgo_verify_1759247916059
+2025-09-30T15:58:36.434Z [error]: Backup verification failed: Cannot read properties of undefined (reading 'count')
+2025-09-30T15:59:29.859Z [info]: Database restored to test db: wazgo_verify_1759247969362
+2025-09-30T15:59:30.047Z [info]: Backup verification successful for: ./backups/backup-2025-09-30T15-58-15-884Z

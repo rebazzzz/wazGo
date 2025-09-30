@@ -6,6 +6,7 @@ import flash from 'connect-flash';
 import bodyParser from 'body-parser';
 import csrf from 'csurf';
 import rateLimit from 'express-rate-limit';
+import db from '../../models/index.js';
 import contactRoutes from '../../routes/contact.js';
 
 const app = express();
@@ -15,9 +16,6 @@ app.use(session({ secret: 'test', resave: false, saveUninitialized: true }));
 app.use(flash());
 const csrfProtection = csrf({ cookie: true });
 app.use(csrfProtection);
-app.get('/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
 
 // Rate limiter (reduced for testing)
 const contactLimiter = rateLimit({
@@ -33,6 +31,14 @@ const contactLimiter = rateLimit({
 app.use('/contact', contactLimiter, contactRoutes);
 
 describe('Rate Limiting', () => {
+  let csrfToken;
+
+  beforeAll(async () => {
+    await db.syncDB({ force: true });
+    const tokenRes = await request(app).get('/contact/csrf');
+    csrfToken = tokenRes.body.csrfToken;
+  });
+
   it('should allow requests within limit', async () => {
     // First request
     const res1 = await request(app)
@@ -40,7 +46,10 @@ describe('Rate Limiting', () => {
       .send({
         name: 'Test User 1',
         email: 'test1@example.com',
-        message: 'Test message 1'
+        company: 'Test Company 1',
+        industry: 'restaurant',
+        message: 'Test message 1',
+        _csrf: csrfToken
       })
       .expect(200);
 
@@ -52,7 +61,10 @@ describe('Rate Limiting', () => {
       .send({
         name: 'Test User 2',
         email: 'test2@example.com',
-        message: 'Test message 2'
+        company: 'Test Company 2',
+        industry: 'restaurant',
+        message: 'Test message 2',
+        _csrf: csrfToken
       })
       .expect(200);
 
@@ -66,7 +78,10 @@ describe('Rate Limiting', () => {
       .send({
         name: 'Test User 3',
         email: 'test3@example.com',
-        message: 'Test message 3'
+        company: 'Test Company 3',
+        industry: 'restaurant',
+        message: 'Test message 3',
+        _csrf: csrfToken
       })
       .expect(429);
 

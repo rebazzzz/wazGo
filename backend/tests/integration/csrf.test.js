@@ -5,6 +5,7 @@ import session from 'express-session';
 import flash from 'connect-flash';
 import bodyParser from 'body-parser';
 import csrf from 'csurf';
+import db from '../../models/index.js';
 import contactRoutes from '../../routes/contact.js';
 
 const app = express();
@@ -17,19 +18,15 @@ app.use(flash());
 const csrfProtection = csrf({ cookie: true });
 app.use(csrfProtection);
 
-// CSRF token endpoint
-app.get('/csrf-token', csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
-
 app.use('/contact', contactRoutes);
 
 describe('CSRF Protection', () => {
   let csrfToken;
 
   beforeAll(async () => {
-    // Get CSRF token
-    const tokenRes = await request(app).get('/csrf-token');
+    await db.syncDB({ force: true });
+    // Get CSRF token from /contact/csrf
+    const tokenRes = await request(app).get('/contact/csrf');
     csrfToken = tokenRes.body.csrfToken;
   });
 
@@ -40,6 +37,8 @@ describe('CSRF Protection', () => {
       .send({
         name: 'Test User',
         email: 'test@example.com',
+        company: 'Test Company',
+        industry: 'restaurant',
         message: 'Test message'
       })
       .expect(200);
@@ -53,6 +52,8 @@ describe('CSRF Protection', () => {
       .send({
         name: 'Test User',
         email: 'test@example.com',
+        company: 'Test Company',
+        industry: 'restaurant',
         message: 'Test message'
       })
       .expect(403);
@@ -68,6 +69,8 @@ describe('CSRF Protection', () => {
       .send({
         name: 'Test User',
         email: 'test@example.com',
+        company: 'Test Company',
+        industry: 'restaurant',
         message: 'Test message'
       })
       .expect(403);

@@ -3,8 +3,79 @@ import db from '../models/index.js';
 import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
 import logger from '../utils/logger.js';
+import NodeCache from 'node-cache';
 
 const { User, Contact, Page } = db;
+
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache with 5 min TTL
+
+/**
+ * Renders the admin dashboard with contact and page counts, and 2FA status.
+ * Uses caching for counts to reduce DB load.
+ * @param {Object} req - Express request object with session user
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/dashboard.ejs with counts and CSRF token
+ */
+export const showDashboard = async (req, res) => {
+  try {
+    let contactCount = cache.get('contactCount');
+    let pageCount = cache.get('pageCount');
+    if (contactCount === undefined) {
+      contactCount = await Contact.count();
+      cache.set('contactCount', contactCount);
+    }
+    if (pageCount === undefined) {
+      pageCount = await Page.count();
+      cache.set('pageCount', pageCount);
+    }
+    const user = await User.findByPk(req.session.user.id);
+    res.render('admin/dashboard', { title: 'Dashboard', contactCount, pageCount, twoFactorEnabled: user.twoFactorEnabled, csrfToken: req.csrfToken() });
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    res.render('admin/dashboard', { title: 'Dashboard', contactCount: 0, pageCount: 0, twoFactorEnabled: false, csrfToken: req.csrfToken() });
+  }
+};
+
+/**
+ * Renders the contacts page with all contacts ordered by creation date.
+ * Uses caching for contacts list to reduce DB load.
+ * Cache is invalidated on contact deletion.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/contacts.ejs with contacts list and CSRF token
+ */
+export const showContacts = async (req, res) => {
+  try {
+    let contacts = cache.get('contactsList');
+    if (contacts === undefined) {
+      contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
+      cache.set('contactsList', contacts);
+    }
+    res.render('admin/contacts', { title: 'Kontakter', contacts, csrfToken: req.csrfToken() });
+  } catch (err) {
+    console.error('Contacts error:', err);
+    res.render('admin/contacts', { title: 'Kontakter', contacts: [], csrfToken: req.csrfToken() });
+  }
+};
+
+/**
+ * Deletes a contact by ID and returns JSON response.
+ * Invalidates contacts cache on success.
+ * @param {Object} req - Express request object with contact ID in body
+ * @param {Object} res - Express response object
+ * @returns {void} JSON response indicating success or failure
+ */
+export const deleteContact = async (req, res) => {
+  const { id } = req.body;
+  try {
+    await Contact.destroy({ where: { id } });
+    cache.del('contactsList'); // Invalidate cache
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete contact error:', err);
+    res.status(500).json({ success: false, message: 'Kunde inte radera kontakt' });
+  }
+};
 
 /**
  * Handles user login process including validation, account locking for failed attempts, and 2FA redirection.
@@ -89,56 +160,7 @@ export const showLogin = (req, res) => {
   res.render('admin/login', { title: 'Admin Login', csrfToken: req.csrfToken() });
 };
 
-/**
- * Renders the admin dashboard with contact and page counts, and 2FA status.
- * @param {Object} req - Express request object with session user
- * @param {Object} res - Express response object
- * @returns {void} Renders admin/dashboard.ejs with counts and CSRF token
- */
-export const showDashboard = async (req, res) => {
-  try {
-    const contactCount = await Contact.count();
-    const pageCount = await Page.count();
-    const user = await User.findByPk(req.session.user.id);
-    res.render('admin/dashboard', { title: 'Dashboard', contactCount, pageCount, twoFactorEnabled: user.twoFactorEnabled, csrfToken: req.csrfToken() });
-  } catch (err) {
-    console.error('Dashboard error:', err);
-    res.render('admin/dashboard', { title: 'Dashboard', contactCount: 0, pageCount: 0, twoFactorEnabled: false, csrfToken: req.csrfToken() });
-  }
-};
 
-/**
- * Renders the contacts page with all contacts ordered by creation date.
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {void} Renders admin/contacts.ejs with contacts list and CSRF token
- */
-export const showContacts = async (req, res) => {
-  try {
-    const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
-    res.render('admin/contacts', { title: 'Kontakter', contacts, csrfToken: req.csrfToken() });
-  } catch (err) {
-    console.error('Contacts error:', err);
-    res.render('admin/contacts', { title: 'Kontakter', contacts: [], csrfToken: req.csrfToken() });
-  }
-};
-
-/**
- * Deletes a contact by ID and returns JSON response.
- * @param {Object} req - Express request object with contact ID in body
- * @param {Object} res - Express response object
- * @returns {void} JSON response indicating success or failure
- */
-export const deleteContact = async (req, res) => {
-  const { id } = req.body;
-  try {
-    await Contact.destroy({ where: { id } });
-    res.json({ success: true });
-  } catch (err) {
-    console.error('Delete contact error:', err);
-    res.status(500).json({ success: false, message: 'Kunde inte radera kontakt' });
-  }
-};
 
 /**
  * Renders the edit page form for a specific page by ID.

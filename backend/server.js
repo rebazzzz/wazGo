@@ -20,6 +20,8 @@ import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
 import logger from './utils/logger.js';
 import { swaggerUi, specs } from './swagger.js';
+import cron from 'node-cron';
+import { backupDatabase, verifyBackup, cleanupOldBackups, getBackupFiles } from './utils/backup.js';
 
 dotenv.config();
 
@@ -90,10 +92,22 @@ app.use((req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Static
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/admin/static', express.static(path.join(__dirname, 'public', 'admin')));
+// Static with cache control
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1d', // Cache static assets for 1 day
+  etag: true,
+  lastModified: true
+}));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '1d',
+  etag: true,
+  lastModified: true
+}));
+app.use('/admin/static', express.static(path.join(__dirname, 'public', 'admin'), {
+  maxAge: '1d',
+  etag: true,
+  lastModified: true
+}));
 
 // Swagger API Documentation
 app.use('/api-docs', swaggerUi.serve);
@@ -162,4 +176,47 @@ app.listen(PORT, async () => {
   await db.syncDB();
   await seedAdminUser();
   console.log(`Server körs på http://localhost:${PORT}`);
+
+  // Schedule automated backups
+  // Daily full backup at 2:00 AM
+  cron.schedule('0 2 * * *', async () => {
+    try {
+      console.log('Starting scheduled database backup...');
+      await backupDatabase();
+      console.log('Scheduled database backup completed.');
+    } catch (error) {
+      console.error('Scheduled database backup failed:', error);
+    }
+  });
+
+  // Weekly backup verification on Sundays at 3:00 AM
+  cron.schedule('0 3 * * 0', async () => {
+    try {
+      console.log('Starting scheduled backup verification...');
+      const backups = getBackupFiles();
+      if (backups.length > 0) {
+        // Verify the latest backup
+        const latestBackup = path.join(__dirname, 'backups', backups.sort().pop());
+        await verifyBackup(latestBackup);
+        console.log('Scheduled backup verification completed.');
+      } else {
+        console.log('No backups found for verification.');
+      }
+    } catch (error) {
+      console.error('Scheduled backup verification failed:', error);
+    }
+  });
+
+  // Monthly cleanup of old backups on the 1st at 4:00 AM
+  cron.schedule('0 4 1 * *', async () => {
+    try {
+      console.log('Starting scheduled backup cleanup...');
+      await cleanupOldBackups();
+      console.log('Scheduled backup cleanup completed.');
+    } catch (error) {
+      console.error('Scheduled backup cleanup failed:', error);
+    }
+  });
+
+  console.log('Automated backup schedules initialized.');
 });
