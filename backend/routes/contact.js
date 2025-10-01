@@ -5,7 +5,6 @@ import { body, validationResult } from 'express-validator';
 import csrf from 'csurf';
 import db from '../models/index.js';
 import logger from '../utils/logger.js';
-import Recaptcha from 'google-recaptcha-v2';
 
 const { Contact } = db;
 
@@ -74,9 +73,21 @@ router.post('/', csrfProtection, contactValidation, async (req, res) => {
 
   // Verify CAPTCHA
   try {
-    const recaptcha = new Recaptcha(process.env.RECAPTCHA_SITE_KEY, process.env.RECAPTCHA_SECRET_KEY);
-    const isValid = await recaptcha.verify(req.body['g-recaptcha-response']);
-    if (!isValid) {
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: req.body['g-recaptcha-response'],
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      logger.warn('CAPTCHA verification failed', { errors: data['error-codes'] });
       return res.status(400).json({ success: false, error: 'CAPTCHA-verifiering misslyckades.' });
     }
   } catch (captchaErr) {
