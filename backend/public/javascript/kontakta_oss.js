@@ -192,25 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // Get CSRF token
-            let csrfToken;
-            try {
-                const tokenRes = await fetch('/contact/csrf');
-                const tokenData = await tokenRes.json();
-                csrfToken = tokenData.csrfToken;
-                // Set the hidden input value
-                const csrfInput = document.getElementById('csrfToken');
-                if (csrfInput) {
-                    csrfInput.value = csrfToken;
-                }
-            } catch (err) {
-                console.error('Failed to get CSRF token:', err);
-                formMessage.textContent = 'Failed to load form, please refresh.';
-                formMessage.classList.add('error', 'show');
-                return;
-            }
 
-            formData._csrf = csrfToken;
 
             try {
                 const res = await fetch('/contact', {

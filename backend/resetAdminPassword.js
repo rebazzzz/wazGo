@@ -22,7 +22,7 @@ async function resetAdminPassword(email, newPassword) {
     user.twoFactorSecret = null;
     await user.save();
 
-    console.log(`Password reset for ${email}. New password: ${newPassword}`);
+    console.log(`Password reset for ${email}.`);
   } catch (err) {
     console.error('Error:', err);
   } finally {

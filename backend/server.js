@@ -220,6 +220,7 @@ app.get('/api/v1/auth/public', (req, res) => {
 
 // Routes
 app.use('/api/v1/contact', jwtAuth, contactRoutes);
+app.use('/contact', contactRoutes); // Public contact form
 app.use('/admin', adminRoutes);
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 // Health check endpoint
