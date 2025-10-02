@@ -16,6 +16,9 @@
     <% if (!twoFactorEnabled) { %>
       <a href="/admin/setup-2fa">Aktivera 2FA</a>
     <% } %>
+    <% if (isMainAdmin) { %>
+      <a href="/admin/admins/login">Admin Management</a>
+    <% } %>
     <a href="/admin/logout" class="logout">Logga ut</a>
   </nav>
 

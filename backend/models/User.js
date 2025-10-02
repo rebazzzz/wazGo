@@ -14,6 +14,7 @@ export default (sequelize) => {
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
     role: { type: DataTypes.STRING, defaultValue: 'admin' },
+    isMainAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
     failedAttempts: { type: DataTypes.INTEGER, defaultValue: 0 },
     lockUntil: { type: DataTypes.DATE, allowNull: true },
     twoFactorSecret: { type: DataTypes.STRING, allowNull: true },

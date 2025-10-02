@@ -29,10 +29,185 @@ export const showDashboard = async (req, res) => {
       cache.set('pageCount', pageCount);
     }
     const user = await User.findByPk(req.session.user.id);
-    res.render('admin/dashboard', { title: 'Dashboard', contactCount, pageCount, twoFactorEnabled: user.twoFactorEnabled, csrfToken: req.csrfToken() });
+    res.render('admin/dashboard', { title: 'Dashboard', contactCount, pageCount, twoFactorEnabled: user.twoFactorEnabled, isMainAdmin: user.isMainAdmin, csrfToken: req.csrfToken() });
   } catch (err) {
     console.error('Dashboard error:', err);
-    res.render('admin/dashboard', { title: 'Dashboard', contactCount: 0, pageCount: 0, twoFactorEnabled: false, csrfToken: req.csrfToken() });
+    res.render('admin/dashboard', { title: 'Dashboard', contactCount: 0, pageCount: 0, twoFactorEnabled: false, isMainAdmin: false, csrfToken: req.csrfToken() });
+  }
+};
+
+/**
+ * Renders the admin management login page for re-authentication.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/admin_management_login.ejs
+ */
+export const showAdminManagementLogin = (req, res) => {
+  res.render('admin/admin_management_login', { title: 'Admin Management Login', csrfToken: req.csrfToken(), error: req.flash('error')[0] || '' });
+};
+
+/**
+ * Handles re-authentication for admin management.
+ * @param {Object} req - Express request object with password in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to admin management or back with error
+ */
+export const doAdminManagementLogin = async (req, res) => {
+  const { password } = req.body;
+  const userId = req.session.user.id;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      req.flash('error', 'User not found');
+      return res.redirect('/admin/admins/login');
+    }
+
+    if (!(await user.comparePassword(password))) {
+      req.flash('error', 'Incorrect password');
+      return res.redirect('/admin/admins/login');
+    }
+
+    req.session.adminManagementAuthenticated = true;
+    res.redirect('/admin/admins');
+  } catch (err) {
+    console.error('Admin management login error:', err);
+    req.flash('error', 'Authentication failed');
+    res.redirect('/admin/admins/login');
+  }
+};
+
+/**
+ * Renders the admin management page with list of admins.
+ * Only accessible by main admin after re-authentication.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Renders admin/admins.ejs with admins list and CSRF token
+ */
+export const showAdmins = async (req, res) => {
+  try {
+    const currentUser = await User.findByPk(req.session.user.id);
+    if (!currentUser.isMainAdmin) {
+      req.flash('error', 'Access denied');
+      return res.redirect('/admin/dashboard');
+    }
+
+    if (!req.session.adminManagementAuthenticated) {
+      return res.redirect('/admin/admins/login');
+    }
+
+    const admins = await User.findAll({ where: { role: 'admin' }, order: [['email', 'ASC']] });
+    res.render('admin/admins', { title: 'Admin Management', admins, currentUserId: currentUser.id, csrfToken: req.csrfToken(), error: res.locals.flash.error[0] || '', success: res.locals.flash.success[0] || '' });
+  } catch (err) {
+    console.error('Show admins error:', err);
+    req.flash('error', 'Failed to load admin list');
+    res.redirect('/admin/dashboard');
+  }
+};
+
+/**
+ * Creates a new admin user.
+ * Only main admin can create new admins.
+ * @param {Object} req - Express request object with email, password, isMainAdmin in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to admin management page with flash message
+ */
+export const createAdmin = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array()[0].msg);
+    return res.redirect('/admin/admins');
+  }
+
+  try {
+    const currentUser = await User.findByPk(req.session.user.id);
+    if (!currentUser.isMainAdmin) {
+      req.flash('error', 'Access denied');
+      return res.redirect('/admin/dashboard');
+    }
+
+    const { email, password, isMainAdmin } = req.body;
+
+    if (!email || !password) {
+      req.flash('error', 'Email and password are required');
+      return res.redirect('/admin/admins');
+    }
+
+    // Check if user with email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      req.flash('error', 'User with this email already exists');
+      return res.redirect('/admin/admins');
+    }
+
+    // Password strength enforcement: minimum 8 chars, at least one uppercase, one lowercase, one digit, one special char
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      req.flash('error', 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character');
+      return res.redirect('/admin/admins');
+    }
+
+    await User.create({
+      email,
+      password,
+      role: 'admin',
+      isMainAdmin: isMainAdmin === 'on' ? true : false
+    });
+
+    req.flash('success', 'Admin user created successfully');
+    res.redirect('/admin/admins');
+  } catch (err) {
+    console.error('Create admin error:', err);
+    req.flash('error', 'Failed to create admin user');
+    res.redirect('/admin/admins');
+  }
+};
+
+/**
+ * Deletes an admin user.
+ * Only main admin can delete admins.
+ * Cannot delete self or other main admins.
+ * @param {Object} req - Express request object with admin id in body
+ * @param {Object} res - Express response object
+ * @returns {void} Redirects to admin management page with flash message
+ */
+export const deleteAdmin = async (req, res) => {
+  try {
+    const currentUser = await User.findByPk(req.session.user.id);
+    if (!currentUser.isMainAdmin) {
+      req.flash('error', 'Access denied');
+      return res.redirect('/admin/dashboard');
+    }
+
+    const { id } = req.body;
+    if (!id) {
+      req.flash('error', 'Invalid admin ID');
+      return res.redirect('/admin/admins');
+    }
+
+    if (parseInt(id) === currentUser.id) {
+      req.flash('error', 'You cannot delete yourself');
+      return res.redirect('/admin/admins');
+    }
+
+    const adminToDelete = await User.findByPk(id);
+    if (!adminToDelete) {
+      req.flash('error', 'Admin user not found');
+      return res.redirect('/admin/admins');
+    }
+
+    if (adminToDelete.isMainAdmin) {
+      req.flash('error', 'You cannot delete another main admin');
+      return res.redirect('/admin/admins');
+    }
+
+    await adminToDelete.destroy();
+    req.flash('success', 'Admin user deleted successfully');
+    res.redirect('/admin/admins');
+  } catch (err) {
+    console.error('Delete admin error:', err);
+    req.flash('error', 'Failed to delete admin user');
+    res.redirect('/admin/admins');
   }
 };
 

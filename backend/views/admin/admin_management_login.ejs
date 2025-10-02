@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      color: #dc3545;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input[type="password"] {
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #c82333;
+    }
+    .error {
+      color: #dc3545;
+      margin-bottom: 1rem;
+    }
+    .back-link {
+      margin-top: 1rem;
+      display: block;
+      font-weight: bold;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>Admin Management Login</h1>
+    <% if (error && error.length > 0) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/admin/admins/login">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <input type="password" name="password" placeholder="Enter your password" required autofocus />
+      <button type="submit">Authenticate</button>
+    </form>
+    <a href="/admin/dashboard" class="back-link">Back to Dashboard</a>
+  </div>
+</body>
+</html>

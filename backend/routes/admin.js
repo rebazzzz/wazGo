@@ -65,6 +65,18 @@ router.use(auth);
 // Dashboard
 router.get('/dashboard', csrfProtection, adminController.showDashboard);
 
+// Admin Management
+router.get('/admins/login', csrfProtection, adminController.showAdminManagementLogin);
+router.post('/admins/login', csrfProtection, adminController.doAdminManagementLogin);
+router.get('/admins', csrfProtection, adminController.showAdmins);
+router.post('/admins/create', csrfProtection, [
+  body('email').isEmail().normalizeEmail(),
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/).withMessage('Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&).')
+], adminController.createAdmin);
+router.post('/admins/delete', csrfProtection, adminController.deleteAdmin);
+
 // Change Password
 router.get('/change-password', csrfProtection, adminController.showChangePassword);
 router.post('/change-password', csrfProtection, [
