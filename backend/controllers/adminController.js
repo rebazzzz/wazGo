@@ -134,6 +134,16 @@ export const doLogin = async (req, res) => {
       res.redirect('/admin/verify-2fa');
     } else {
       req.session.user = { id: user.id, email: user.email, role: user.role };
+
+      // Set database session variables for RLS
+      try {
+        await db.sequelize.query('SELECT set_admin_session($1, $2)', {
+          bind: [user.id.toString(), user.role]
+        });
+      } catch (rlsError) {
+        logger.error('Failed to set RLS session variables', { error: rlsError.message, userId: user.id });
+      }
+
       res.redirect('/admin/dashboard');
     }
   } catch (err) {
@@ -340,7 +350,14 @@ export const showPages = async (req, res) => {
  * @param {Object} res - Express response object
  * @returns {void} Redirects to /admin/login
  */
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
+  // Clear database session variables for RLS
+  try {
+    await db.sequelize.query('SELECT clear_admin_session()');
+  } catch (rlsError) {
+    logger.error('Failed to clear RLS session variables', { error: rlsError.message });
+  }
+
   req.session.destroy();
   res.redirect('/admin/login');
 };
@@ -542,6 +559,16 @@ export const verify2FA = async (req, res) => {
     if (context === 'login') {
       req.session.user = { id: user.id, email: user.email, role: user.role };
       delete req.session.pending2FA;
+
+      // Set database session variables for RLS
+      try {
+        await db.sequelize.query('SELECT set_admin_session($1, $2)', {
+          bind: [user.id.toString(), user.role]
+        });
+      } catch (rlsError) {
+        logger.error('Failed to set RLS session variables', { error: rlsError.message, userId: user.id });
+      }
+
       res.redirect('/admin/dashboard');
     } else if (context === 'password-change') {
       const { newPassword } = req.session.pendingPasswordChange;
