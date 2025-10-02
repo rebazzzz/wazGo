@@ -16,6 +16,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as Sentry from '@sentry/node';
 import { httpIntegration, consoleIntegration } from '@sentry/node';
+import compression from 'compression';
+import cluster from 'cluster';
+import os from 'os';
+import promClient from 'prom-client';
 
 import db from './models/index.js';
 import adminRoutes from './routes/admin.js';
@@ -71,10 +75,46 @@ Sentry.init({
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Prometheus metrics
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+const httpRequestDuration = new promClient.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'status_code'],
+  buckets: [0.1, 0.5, 1, 2, 5]
+});
+register.registerMetric(httpRequestDuration);
 
+// Sync database
+try {
+  await db.syncDB();
+} catch (error) {
+  console.error('Database sync failed, continuing without sync:', error.message);
+}
+
+// Clustering for scalability (only in production)
+if (process.env.NODE_ENV === 'production' && cluster.isPrimary) {
+  const numCPUs = os.cpus().length;
+  console.log(`Primary cluster setting up ${numCPUs} workers...`);
+
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`);
+    console.log('Starting a new worker');
+    cluster.fork();
+  });
+} else {
+  // Worker processes
+  console.log(`Worker ${process.pid} started`);
 
 // Security headers
 app.use(helmet({
@@ -90,6 +130,22 @@ app.use(helmet({
     },
   },
 }));
+
+// Compression middleware
+app.use(compression());
+
+// Request duration middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = (Date.now() - start) / 1000;
+    httpRequestDuration.observe(
+      { method: req.method, route: req.route?.path || req.path, status_code: res.statusCode },
+      duration
+    );
+  });
+  next();
+});
 
 // Middleware
 app.use(cors());
@@ -177,6 +233,12 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Prometheus metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
 // API for reCAPTCHA site key
 app.get('/api/recaptcha-site-key', (req, res) => {
   res.json({ siteKey: process.env.RECAPTCHA_SITE_KEY || '' });
@@ -202,35 +264,8 @@ app.use((err, req, res, next) => {
   }
 });
 
-
-// Seed admin user if not exists
-const seedAdminUser = async () => {
-  const { User } = db;
-  const adminEmail = 'admin@wazgo.se';
-  const defaultPassword = 'TempSecurePass123!'; // Strong default password, change immediately after first login
-
-  try {
-    const admin = await User.findOne({ where: { email: adminEmail } });
-    if (!admin) {
-      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-      await User.create({
-        email: adminEmail,
-        password: hashedPassword,
-        role: 'admin'
-      });
-      console.log('Admin user created with default password: TempSecurePass123!. Please change it immediately.');
-    } else {
-      console.log('Admin user already exists.');
-    }
-  } catch (err) {
-    console.error('Error seeding admin user:', err);
-  }
-};
-
 // Start server
 app.listen(PORT, async () => {
-  await db.syncDB();
-  await seedAdminUser();
   console.log(`Server körs på http://localhost:${PORT}`);
 
   // Schedule automated backups
@@ -276,3 +311,6 @@ app.listen(PORT, async () => {
 
   console.log('Automated backup schedules initialized.');
 });
+}
+
+export default app;

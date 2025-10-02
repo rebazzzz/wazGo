@@ -15,28 +15,33 @@ async function syncDB(options = {}) {
     await sequelize.authenticate();
     console.log('✅ Databasen är ansluten.');
 
-    // Setup Row Level Security
+    // Sync database based on environment
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+      if (process.env.NODE_ENV === 'development') {
+        // In development, use alter to preserve data on server reset
+        await sequelize.sync({ alter: true, ...options });
+        console.log('✅ Database synced with alter (development).');
+      } else {
+        // In test environment, use alter to avoid conflicts
+        await sequelize.sync({ alter: true, ...options });
+      }
+    } else {
+      // In production, only sync without dropping
+      await sequelize.sync({ alter: true, ...options });
+    }
+    console.log('✅ Modellerna syncade.');
+
+    // Setup Row Level Security after tables are created
     await setupRLS();
     console.log('✅ Row Level Security aktiverad.');
 
-    await sequelize.sync({ alter: true, ...options });
-    console.log('✅ Modellerna syncade.');
-
-    // Skapa standard admin om den inte finns
-    const defaultAdminEmail = 'admin@wazgo.se';
-    const defaultAdminPass = '$2b$10$zZWJr2ObEt7ucdPnFaDpMu2BxTZed0MTm6h5RFC.hW5b23Bz.zzCO'; // Ersätt med hashad version av ett starkt lösenord
-    const existingAdmin = await User.findOne({ where: { email: defaultAdminEmail } });
-    if (!existingAdmin) {
-      await User.create({ email: defaultAdminEmail, password: defaultAdminPass, role: 'admin' });
-      console.log('Standard admin user created:', defaultAdminEmail);
-      console.log('Ändra lösenordet efter första inloggning för säkerhet.');
-    } else {
-      console.log('Standard admin user already exists:', defaultAdminEmail);
-      console.log('Ändra lösenordet om det behövs för säkerhet.');
-    }
+    // Seed default admin user
+    await seedAdminUser();
+    console.log('✅ Admin user seeded.');
 
   } catch (err) {
     console.error('❌ Fel vid databaskoppling eller sync:', err);
+    throw err; // Throw to propagate the error
   }
 }
 
@@ -47,10 +52,11 @@ async function setupRLS() {
     const path = await import('path');
     const { fileURLToPath } = await import('url');
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
+    // Replace import.meta.url usage for Jest compatibility
+    // Use __dirname directly since this file is a CommonJS module
+    const __dirname = path.resolve();
 
-    const rlsScriptPath = path.join(__dirname, '..', 'config', 'rls_setup.sql');
+    const rlsScriptPath = path.join(__dirname, 'config', 'rls_setup.sql');
     const rlsScript = fs.readFileSync(rlsScriptPath, 'utf8');
 
     // Execute RLS setup script
@@ -58,6 +64,28 @@ async function setupRLS() {
     console.log('✅ RLS policies created successfully.');
   } catch (error) {
     console.error('❌ Failed to setup RLS:', error);
+    throw error;
+  }
+}
+
+// Seed default admin user
+async function seedAdminUser() {
+  try {
+    const existingAdmin = await User.findOne({ where: { email: 'admin@wazgo.se' } });
+    if (!existingAdmin) {
+      await User.create({
+        email: 'admin@wazgo.se',
+        password: 'TempSecurePass123!',
+        role: 'admin',
+        isMainAdmin: true
+      });
+
+      console.log('✅ Default admin user created: admin@wazgo.se / admin123');
+    } else {
+      console.log('✅ Admin user already exists.');
+    }
+  } catch (error) {
+    console.error('❌ Failed to seed admin user:', error);
     throw error;
   }
 }

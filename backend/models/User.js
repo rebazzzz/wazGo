@@ -24,6 +24,11 @@ export default (sequelize) => {
     modelName: 'User',
     tableName: 'users',
     timestamps: false,
+    indexes: [
+      {
+        fields: ['email']
+      }
+    ],
     hooks: {
       beforeCreate: async (user) => {
         if (user.password && user.password.length < 60) {

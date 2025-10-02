@@ -34,11 +34,17 @@ CREATE POLICY users_self ON users
     USING (id::text = current_setting('app.current_user_id', true));
 
 -- Contacts table policies
--- Only admins can access contact submissions
+-- Admins can access all contact submissions
 DROP POLICY IF EXISTS contacts_admin_only ON contacts;
 CREATE POLICY contacts_admin_only ON contacts
     FOR ALL
     USING (current_setting('app.current_user_role', true) = 'admin');
+
+-- Allow public users to insert contact submissions
+DROP POLICY IF EXISTS contacts_public_insert ON contacts;
+CREATE POLICY contacts_public_insert ON contacts
+    FOR INSERT
+    WITH CHECK (true);
 
 -- Pages table policies
 -- Only admins can manage pages
@@ -48,11 +54,11 @@ CREATE POLICY pages_admin_only ON pages
     USING (current_setting('app.current_user_role', true) = 'admin');
 
 -- Create function to set session variables for authenticated users
-CREATE OR REPLACE FUNCTION set_admin_session(user_id TEXT, user_role TEXT DEFAULT 'admin')
+CREATE OR REPLACE FUNCTION set_admin_session(user_id INTEGER, user_role TEXT DEFAULT 'admin')
 RETURNS VOID AS $$
 BEGIN
     -- Set session variables that RLS policies will check
-    PERFORM set_config('app.current_user_id', user_id, false);
+    PERFORM set_config('app.current_user_id', user_id::text, false);
     PERFORM set_config('app.current_user_role', user_role, false);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -68,5 +74,9 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant execute permissions on the functions
-GRANT EXECUTE ON FUNCTION set_admin_session(TEXT, TEXT) TO wazgo_admin;
+GRANT EXECUTE ON FUNCTION set_admin_session(INTEGER, TEXT) TO wazgo_admin;
 GRANT EXECUTE ON FUNCTION clear_admin_session() TO wazgo_admin;
+
+-- Also grant to postgres user for testing
+GRANT EXECUTE ON FUNCTION set_admin_session(INTEGER, TEXT) TO postgres;
+GRANT EXECUTE ON FUNCTION clear_admin_session() TO postgres;
