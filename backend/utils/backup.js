@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 import pg from 'pg';
 import logger from './logger.js';
 import db from '../models/index.js';
@@ -17,6 +18,54 @@ const BACKUP_DIR = path.join(__dirname, '..', 'backups');
 // Ensure backup directory exists
 if (!fs.existsSync(BACKUP_DIR)) {
   fs.mkdirSync(BACKUP_DIR, { recursive: true });
+}
+
+// Encryption configuration
+const ENCRYPTION_KEY = process.env.BACKUP_ENCRYPTION_KEY || crypto.randomBytes(32); // 256-bit key
+const ALGORITHM = 'aes-256-gcm';
+
+/**
+ * Encrypt data using AES-256-GCM
+ * @param {string} text - Plain text to encrypt
+ * @returns {string} Encrypted data as base64 string
+ */
+function encrypt(text) {
+  const iv = crypto.randomBytes(16); // 128-bit IV
+  const cipher = crypto.createCipher(ALGORITHM, ENCRYPTION_KEY);
+  cipher.setAAD(Buffer.from('backup-data')); // Additional authenticated data
+
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+
+  const authTag = cipher.getAuthTag();
+
+  // Return format: iv:authTag:encryptedData
+  return iv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted;
+}
+
+/**
+ * Decrypt data using AES-256-GCM
+ * @param {string} encryptedText - Encrypted data as base64 string
+ * @returns {string} Decrypted plain text
+ */
+function decrypt(encryptedText) {
+  const parts = encryptedText.split(':');
+  if (parts.length !== 3) {
+    throw new Error('Invalid encrypted data format');
+  }
+
+  const iv = Buffer.from(parts[0], 'hex');
+  const authTag = Buffer.from(parts[1], 'hex');
+  const encrypted = parts[2];
+
+  const decipher = crypto.createDecipher(ALGORITHM, ENCRYPTION_KEY);
+  decipher.setAAD(Buffer.from('backup-data'));
+  decipher.setAuthTag(authTag);
+
+  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+
+  return decrypted;
 }
 
 /**
