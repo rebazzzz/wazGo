@@ -2,7 +2,6 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
 import { body, validationResult } from 'express-validator';
-import csrf from 'csurf';
 import db from '../models/index.js';
 import logger from '../utils/logger.js';
 
@@ -10,16 +9,10 @@ const { Contact } = db;
 
 const router = express.Router();
 
-const csrfProtection = csrf({ cookie: true });
-
-// GET CSRF token
-router.get('/csrf', csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
-
-// Session-based rate limiter for contact form
-const SESSION_RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
-const SESSION_RATE_LIMIT_MAX = 3; // max 3 submissions per session per window
+// IP-based rate limiter for contact form
+const IP_RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+const IP_RATE_LIMIT_MAX = 3; // max 3 submissions per IP per window
+const ipSubmissions = new Map(); // In-memory store, in production use Redis or DB
 
 // Validation rules for contact form
 const contactValidation = [
@@ -53,18 +46,127 @@ const contactValidation = [
     .notEmpty().withMessage('CAPTCHA-verifiering krävs.')
 ];
 
-router.post('/', csrfProtection, contactValidation, async (req, res) => {
-  // Session-based rate limiting
-  if (!req.session.contactSubmissions) {
-    req.session.contactSubmissions = [];
-  }
+/**
+ * @swagger
+ * /api/v1/contact:
+ *   post:
+ *     summary: Submit contact form
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - company
+ *               - message
+ *               - g-recaptcha-response
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 100
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               company:
+ *                 type: string
+ *                 maxLength: 100
+ *               industry:
+ *                 type: string
+ *                 enum: [restaurant, retail, nonprofit, other]
+ *               otherIndustry:
+ *                 type: string
+ *                 maxLength: 100
+ *               message:
+ *                 type: string
+ *                 minLength: 10
+ *                 maxLength: 1000
+ *               g-recaptcha-response:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Contact form submitted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Tack! Vi har mottagit ditt meddelande."
+ *       400:
+ *         description: Bad request - validation error or CAPTCHA failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized - invalid JWT
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "No token provided"
+ *       429:
+ *         description: Too many requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "För många kontaktförfrågningar från denna IP. Försök igen senare."
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ */
+router.post('/', contactValidation, async (req, res) => {
+  // IP-based rate limiting
+  const clientIP = req.ip;
   const now = Date.now();
-  req.session.contactSubmissions = req.session.contactSubmissions.filter(
-    timestamp => now - timestamp < SESSION_RATE_LIMIT_WINDOW
-  );
-  if (req.session.contactSubmissions.length >= SESSION_RATE_LIMIT_MAX) {
-    return res.status(429).json({ success: false, error: 'För många kontaktförfrågningar från denna session. Försök igen senare.' });
+  if (!ipSubmissions.has(clientIP)) {
+    ipSubmissions.set(clientIP, []);
   }
+  const submissions = ipSubmissions.get(clientIP);
+  const recentSubmissions = submissions.filter(timestamp => now - timestamp < IP_RATE_LIMIT_WINDOW);
+  if (recentSubmissions.length >= IP_RATE_LIMIT_MAX) {
+    return res.status(429).json({ success: false, error: 'För många kontaktförfrågningar från denna IP. Försök igen senare.' });
+  }
+  recentSubmissions.push(now);
+  ipSubmissions.set(clientIP, recentSubmissions);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -117,8 +219,7 @@ router.post('/', csrfProtection, contactValidation, async (req, res) => {
       message
     });
 
-    // Record successful submission for rate limiting
-    req.session.contactSubmissions.push(now);
+
 
     // Skicka JSON-svar till frontend omedelbart
     res.json({ success: true, message: 'Tack! Vi har mottagit ditt meddelande.' });

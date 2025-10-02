@@ -13,12 +13,14 @@ import csrf from 'csurf';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import * as Sentry from '@sentry/node';
 import { httpIntegration, consoleIntegration } from '@sentry/node';
 
 import db from './models/index.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
+import jwtAuth from './middleware/jwtAuth.js';
 import logger from './utils/logger.js';
 import { swaggerUi, specs } from './swagger.js';
 import cron from 'node-cron';
@@ -42,7 +44,7 @@ const getEnvVar = (varName) => {
 
 // Check for required environment variables
 const requiredEnvVars = [
-  'SESSION_SECRET',
+  'SESSION_SECRET', 'JWT_SECRET',
   'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS',
   'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM',
   'RECAPTCHA_SITE_KEY', 'RECAPTCHA_SECRET_KEY'
@@ -91,8 +93,8 @@ app.use(helmet({
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(cookieParser());
 
 // Sessions + flash
@@ -154,9 +156,14 @@ if (process.env.NODE_ENV === 'test') {
   });
 }
 
-// Routes
+// Public JWT endpoint
+app.get('/api/v1/auth/public', (req, res) => {
+  const token = jwt.sign({ role: 'public' }, getEnvVar('JWT_SECRET'), { expiresIn: '1h' });
+  res.json({ token });
+});
 
-app.use('/contact', contactRoutes);
+// Routes
+app.use('/api/v1/contact', jwtAuth, contactRoutes);
 app.use('/admin', adminRoutes);
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 // Health check endpoint

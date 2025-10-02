@@ -27,6 +27,11 @@ const options = {
           in: 'header',
           name: 'x-csrf-token',
         },
+        jwtAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
       },
     },
     security: [
