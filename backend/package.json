@@ -12,6 +12,9 @@
     "verify-backup": "node -e \"import('./utils/backup.js').then(m => { const files = m.getBackupFiles(); if (files.length) { const latest = files.sort().pop(); m.verifyBackup('./backups/' + latest).then(() => console.log('Verification completed')).catch(console.error); } else console.log('No backups found'); })\"",
     "cleanup-backups": "node -e \"import('./utils/backup.js').then(m => m.cleanupOldBackups()).then(() => console.log('Cleanup completed')).catch(console.error)\""
   },
+  "engines": {
+  "node": "22.x"
+},
   "dependencies": {
     "@playwright/test": "^1.55.1",
     "@sentry/node": "^10.15.0",
