@@ -45,6 +45,8 @@ const getEnvVar = (varName) => {
   }
   return process.env[varName];
 };
+console.log('CWD:', process.cwd());
+console.log('Files in current dir:', fs.readdirSync('.'));
 
 // Check for required environment variables
 const requiredEnvVars = [
